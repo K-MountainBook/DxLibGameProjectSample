@@ -127,15 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DxLibGameProjectSample.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="targetver.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="DxLibGameProjectSample.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="DxLibGameProjectSample.rc" />
   </ItemGroup>
   <ItemGroup>
