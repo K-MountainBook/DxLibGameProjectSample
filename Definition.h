@@ -21,6 +21,11 @@ const unsigned int yellow = GetColor(255, 255, 0);
 const unsigned int white = GetColor(255, 255, 255);
 const unsigned int black = GetColor(0, 0, 0);
 
+
+void Update();
+
+void Render();
+
 /// <summary>
 /// ゲームオブジェクト構造体（これをベースとする）
 /// </summary>
