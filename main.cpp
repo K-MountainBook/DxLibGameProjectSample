@@ -30,8 +30,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// ミリ秒単位の現在時刻を得る
 		time = GetNowCount();
 
-		Update();
-
 		Render();
 
 		// バックバッファの書き込みが終わったらフロントバッファへデータを転送する。
@@ -55,9 +53,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	return 0;				// ソフトの終了 
 }
 
-void Update() {
-
-}
 
 void Render() {
 	DrawGraph(0, 0, PlayerSpriteHandle[2], false);
