@@ -139,12 +139,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Definition.h" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Res\Image\background_back.png" />
     <Image Include="Res\Image\background_front.png" />
     <Image Include="Res\Image\background_middle.png" />
@@ -171,6 +165,12 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DxLibGameProjectSample.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\Definition.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
