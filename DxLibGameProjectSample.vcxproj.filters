@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="リソース ファイル\Image">
+      <UniqueIdentifier>{c887c022-c4ed-43ec-9575-ac1ee3537290}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -25,56 +28,79 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Res\Image\Player_2.png">
+      <Filter>リソース ファイル\Image</Filter>
+    </Image>
     <Image Include="Res\Image\_SampleBoss.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\_SampleBullet.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\_SampleBullet_2.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\_SampleEnemy.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\_SamplePlayer.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\back_ground.bmp">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
+    </Image>
+    <Image Include="Res\Image\background_back.png">
+      <Filter>リソース ファイル\Image</Filter>
+    </Image>
+    <Image Include="Res\Image\background_front.png">
+      <Filter>リソース ファイル\Image</Filter>
+    </Image>
+    <Image Include="Res\Image\background_middle.png">
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\boss.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\Bullet_1.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\Bullet_2.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\Bullet_3.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\Bullet_4.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
+    </Image>
+    <Image Include="Res\Image\Bullet_5.png">
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\chara_map1.bmp">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\chara_map2.bmp">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\Enemy.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\Explosion.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
+    </Image>
+    <Image Include="Res\Image\Explosion_2.png">
+      <Filter>リソース ファイル\Image</Filter>
+    </Image>
+    <Image Include="Res\Image\Heart.png">
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
     <Image Include="Res\Image\Player_1.png">
-      <Filter>リソース ファイル</Filter>
+      <Filter>リソース ファイル\Image</Filter>
     </Image>
-    <Image Include="Res\Image\Player_2.png">
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DxLibGameProjectSample.rc">
       <Filter>リソース ファイル</Filter>
-    </Image>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

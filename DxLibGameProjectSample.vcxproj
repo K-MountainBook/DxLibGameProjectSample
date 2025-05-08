@@ -145,16 +145,22 @@
     <ClInclude Include="Definition.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Res\Image\background_back.png" />
+    <Image Include="Res\Image\background_front.png" />
+    <Image Include="Res\Image\background_middle.png" />
     <Image Include="Res\Image\back_ground.bmp" />
     <Image Include="Res\Image\boss.png" />
     <Image Include="Res\Image\Bullet_1.png" />
     <Image Include="Res\Image\Bullet_2.png" />
     <Image Include="Res\Image\Bullet_3.png" />
     <Image Include="Res\Image\Bullet_4.png" />
+    <Image Include="Res\Image\Bullet_5.png" />
     <Image Include="Res\Image\chara_map1.bmp" />
     <Image Include="Res\Image\chara_map2.bmp" />
     <Image Include="Res\Image\Enemy.png" />
     <Image Include="Res\Image\Explosion.png" />
+    <Image Include="Res\Image\Explosion_2.png" />
+    <Image Include="Res\Image\Heart.png" />
     <Image Include="Res\Image\Player_1.png" />
     <Image Include="Res\Image\Player_2.png" />
     <Image Include="Res\Image\_SampleBoss.png" />
@@ -162,6 +168,9 @@
     <Image Include="Res\Image\_SampleBullet_2.png" />
     <Image Include="Res\Image\_SampleEnemy.png" />
     <Image Include="Res\Image\_SamplePlayer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DxLibGameProjectSample.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
