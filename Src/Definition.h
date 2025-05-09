@@ -20,6 +20,7 @@
 
 #define ENEMY_BULLET_MAX		(100)
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
+#define ENEMY_BULLET_SPEED		(2.0f)
 
 //	色
 const unsigned int red = GetColor(255, 0, 0);
@@ -432,6 +433,7 @@ struct Enemy {
 		}
 
 		Move();
+		Shoot(_targetX, _targetY);
 	}
 
 	void Render() {
@@ -459,21 +461,31 @@ struct Enemy {
 	}
 
 	void Shoot(float targetX, float targetY) {
-		if (shotInterval >= SHOT_INTEVAL) {
+		if (shotInterval < SHOT_INTEVAL) {
 			shotInterval++;
 		}
 
 		// 敵なのでインターバルが終わったら無条件で弾を吐き出す。
 		if (shotInterval >= SHOT_INTEVAL) {
+
+			shotInterval = 0;
+
 			for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
 				// 既に表示されている（つまりは発射されている
 				// 弾に関しては処理を行わない（この関数は発射用のため
 				if (bullets[i].gameObject.isVisible) {
 					continue;
 				}
+				// TODO:敵の中心（あるいは先端）から弾が出るようにしたい
+				bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx, gameObject.cy, gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
 
-				shotInterval = 0;
-				bullets[i].Init(EnemyBulletAnimations, true, gameObject.x, gameObject.y, gameObject.radius);
+				float angle = atan2((targetY - bullets[i].gameObject.height / 2) - gameObject.y, (targetX - bullets[i].gameObject.width / 2) - gameObject.x);
+
+				bullets[i].moveX = cosf(angle) * ENEMY_BULLET_SPEED;
+				bullets[i].moveY = sinf(angle) * ENEMY_BULLET_SPEED;
+
+				break;
+
 			}
 
 		}

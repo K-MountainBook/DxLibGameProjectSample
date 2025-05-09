@@ -115,7 +115,7 @@ void Update() {
 	// プレイヤーの情報を更新する（上のキー情報を利用するなどしてこのフレームでプレイヤーをどこに描画するか確定する）
 	player.Update();
 	// エネミーの情報を更新する。
-	enemy.Update(player.gameObject.x, player.gameObject.y);
+	enemy.Update(player.gameObject.cx, player.gameObject.cy);
 	// 背景の描画位置を更新する（動いているように見せるため、背景画像の位置を動かす）
 	for (int i = 0; i < BACK_GROUND_IMAGE_MAX; i++) {
 		BackGrounds[i].Update(scr);
