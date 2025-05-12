@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <DxLib.h>
 #include <string>
 
@@ -47,6 +46,9 @@ void Update();
 
 void Render();
 
+/// <summary>
+/// 入力キー列挙型
+/// </summary>
 enum MyInput {
 	W,
 	A,
@@ -58,6 +60,9 @@ enum MyInput {
 	InputMax,
 };
 
+/// <summary>
+/// 背景レイヤー列挙型
+/// </summary>
 enum BackGroundLayer {
 	BACK_GROUND_1,
 	BACK_GROUND_2,
@@ -138,6 +143,14 @@ struct GameObject {
 	float cx, cy;					// 中心座標
 	float radius;					// 半径
 
+	/// <summary>
+	/// 初期化関数
+	/// </summary>
+	/// <param name="_image">画像ハンドル</param>
+	/// <param name="_visible">表示フラグ</param>
+	/// <param name="_x">X座標</param>
+	/// <param name="_y">Y座標</param>
+	/// <param name="_radius">判定半径</param>
 	void Init(int _image, bool _visible = true, float _x = 0.0f, float _y = 0.0f, float _radius = 0.0f) {
 		// 表示フラグの初期化
 		isVisible = _visible;
@@ -164,23 +177,37 @@ struct BackGround {
 	float scrollSpeed;
 	float currentScroll;
 
+	/// <summary>
+	/// 初期化関数
+	/// </summary>
+	/// <param name="_image">画像ハンドル</param>
+	/// <param name="_speed">スクロールスピード</param>
 	void Init(int _image, float _speed) {
 		gameObject.Init(_image);
 		scrollSpeed = _speed;
 		currentScroll = 0.0f;
 	}
 
+	/// <summary>
+	/// 更新関数
+	/// </summary>
+	/// <param name="_scroll">スクロール量</param>
 	void Update(float _scroll) {
 		if (!gameObject.isVisible) {
 			return;
 		}
 
+		// スクロール量を画像の高さで割り余りを求める
 		currentScroll = (int)(_scroll * scrollSpeed) % gameObject.height;
+		// 余りが画像の高さを超過したらスクロール量を0に戻す
 		if (currentScroll > gameObject.height) {
 			currentScroll = 0.0f;
 		}
 	}
 
+	/// <summary>
+	/// 描画関数
+	/// </summary>
 	void Render() {
 		if (!gameObject.isVisible) {
 			return;
@@ -219,6 +246,15 @@ struct Bullet {
 	int currentAnimation;
 	int animationCount;
 
+	/// <summary>
+	/// 初期化関数
+	/// </summary>
+	/// <param name="_images">画像ハンドル</param>
+	/// <param name="_visible">表示フラグ</param>
+	/// <param name="_x">X座標</param>
+	/// <param name="_y">Y座標</param>
+	/// <param name="_radius">判定半径</param>
+	/// <param name="_animationCount">画像のアニメーション数</param>
 	void Init(int _images[], bool _visible = true, float _x = 0.0f, float _y = 0.0f, float _radius = 0.0f, int _animationCount = -1) {
 		gameObject.Init(_images[0], _visible, _x, _y, _radius);
 		animationCount = _animationCount;
@@ -234,6 +270,9 @@ struct Bullet {
 		moveX = moveY = 0;
 	}
 
+	/// <summary>
+	/// 更新関数
+	/// </summary>
 	void Update() {
 		if (!gameObject.isVisible) {
 			return;
@@ -269,6 +308,9 @@ struct Bullet {
 		}
 	}
 
+	/// <summary>
+	/// 描画関数
+	/// </summary>
 	void Render() {
 		if (!gameObject.isVisible) {
 			return;
@@ -289,6 +331,14 @@ struct Player {
 	int shotInterval;				// カウント用変数
 	const int SHOT_INTERVAL = 10;	// 発射間隔定数
 
+	/// <summary>
+	/// 初期化関数
+	/// </summary>
+	/// <param name="_image">画像ハンドル</param>
+	/// <param name="_visible">表示フラグ</param>
+	/// <param name="_x">X座標</param>
+	/// <param name="_y">Y座標</param>
+	/// <param name="_radius">判定半径</param>
 	void Init(int _image, bool _visible = true, float _x = 0.0f, float _y = 0.0f, float _radius = 0.0f) {
 		gameObject.Init(_image, _visible, _x, _y, _radius);
 		moveX = moveY = 0.0f;
@@ -296,6 +346,9 @@ struct Player {
 		shotInterval = SHOT_INTERVAL;
 	}
 
+	/// <summary>
+	/// 更新関数
+	/// </summary>
 	void Update() {
 
 		// 発射した弾の更新処理
@@ -314,6 +367,9 @@ struct Player {
 		Shoot();
 	}
 
+	/// <summary>
+	/// 描画関数
+	/// </summary>
 	void Render() {
 
 		// 発射した弾の描画処理
@@ -329,6 +385,9 @@ struct Player {
 		DrawGraph(gameObject.x, gameObject.y, gameObject.image, TRUE);
 	}
 
+	/// <summary>
+	/// 移動関数
+	/// </summary>
 	void Move() {
 		moveX = moveY = 0.0f;
 
@@ -374,6 +433,9 @@ struct Player {
 
 	}
 
+	/// <summary>
+	/// 射撃関数
+	/// </summary>
 	void Shoot() {
 		// インターバルの更新
 		if (shotInterval < SHOT_INTERVAL) {
@@ -402,7 +464,9 @@ struct Player {
 	}
 };
 
-
+/// <summary>
+/// 敵構造体
+/// </summary>
 struct Enemy {
 	GameObject gameObject;
 	float moveX, moveY;
@@ -411,6 +475,14 @@ struct Enemy {
 	int shotInterval;
 	const int SHOT_INTEVAL = 120;
 
+	/// <summary>
+	/// 更新関数
+	/// </summary>
+	/// <param name="_image">画像ハンドル</param>
+	/// <param name="_visible">表示フラグ</param>
+	/// <param name="_x">X座標</param>
+	/// <param name="_y">Y座標</param>
+	/// <param name="_radius">半径</param>
 	void Init(int _image, bool _visible = true, float _x = 0.0f, float _y = 0.0f, float _radius = 0.0f) {
 		gameObject.Init(_image, _visible, _x, _y, _radius);
 		moveX = moveY = 0.0f;
@@ -421,8 +493,8 @@ struct Enemy {
 	/// <summary>
 	/// 弾の発射先もここで指定する
 	/// </summary>
-	/// <param name="_targetX"></param>
-	/// <param name="_targetY"></param>
+	/// <param name="_targetX">発射先のX座標</param>
+	/// <param name="_targetY">発射先のY座標</param>
 	void Update(float _targetX, float _targetY) {
 		for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
 			bullets[i].Update();
@@ -436,6 +508,9 @@ struct Enemy {
 		Shoot(_targetX, _targetY);
 	}
 
+	/// <summary>
+	/// 描画関数
+	/// </summary>
 	void Render() {
 		for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
 			bullets[i].Render();
@@ -448,6 +523,9 @@ struct Enemy {
 		DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
 	}
 
+	/// <summary>
+	/// 移動関数
+	/// </summary>
 	void Move() {
 		gameObject.x += moveX;
 		gameObject.y += moveY;
@@ -460,6 +538,11 @@ struct Enemy {
 
 	}
 
+	/// <summary>
+	/// 射撃関数
+	/// </summary>
+	/// <param name="targetX">目標のX座標</param>
+	/// <param name="targetY">目標のY座標</param>
 	void Shoot(float targetX, float targetY) {
 		if (shotInterval < SHOT_INTEVAL) {
 			shotInterval++;
@@ -479,6 +562,7 @@ struct Enemy {
 				// TODO:敵の中心（あるいは先端）から弾が出るようにしたい
 				bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx, gameObject.cy, gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
 
+				// ATANを用いて敵の角度（ラジアン）を計算
 				float angle = atan2((targetY - bullets[i].gameObject.height / 2) - gameObject.y, (targetX - bullets[i].gameObject.width / 2) - gameObject.x);
 
 				bullets[i].moveX = cosf(angle) * ENEMY_BULLET_SPEED;
