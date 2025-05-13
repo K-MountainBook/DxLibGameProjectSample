@@ -69,6 +69,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	for (int i = 0; i < PLAYER_BULLET_MAX; i++) {
 		player.bullets[i].Init(PlayerBulletAnimation, false, 0, 0, 32.0f, PLAYER_BULLET_ANIMATION_MAX);
 	}
+
+	for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
+		enemy.bullets[i].Init(EnemyBulletAnimations, false, 0, 0, 16.0f, ENEMY_BULLET_ANIMATION_MAX);
+	}
+
 	// ƒƒCƒ“ƒ‹[ƒv
 	while (1) {
 

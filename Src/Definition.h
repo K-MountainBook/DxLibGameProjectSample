@@ -475,7 +475,7 @@ struct Enemy {
 
 	Bullet bullets[ENEMY_BULLET_MAX];
 	int shotInterval;
-	const int SHOT_INTEVAL = 120;
+	const int SHOT_INTEVAL = 10;
 
 	/// <summary>
 	/// 更新関数
@@ -562,10 +562,15 @@ struct Enemy {
 					continue;
 				}
 				// TODO:敵の中心（あるいは先端）から弾が出るようにしたい
-				bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx, gameObject.cy, gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
+				// bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
+				bullets[i].gameObject.x = gameObject.cx - bullets[i].gameObject.width / 2;
+				bullets[i].gameObject.y = gameObject.cy - bullets[i].gameObject.height / 2;
+				bullets[i].gameObject.isVisible = true;
+
 
 				// ATANを用いて敵の角度（ラジアン）を計算
-				float angle = atan2((targetY - bullets[i].gameObject.height / 2) - gameObject.y, (targetX - bullets[i].gameObject.width / 2) - gameObject.x);
+				// targetX,targetYは目標の中央座標
+				float angle = atan2((targetY - bullets[i].gameObject.height) - gameObject.y, (targetX - bullets[i].gameObject.width) - gameObject.x);
 
 				bullets[i].moveX = cosf(angle) * ENEMY_BULLET_SPEED;
 				bullets[i].moveY = sinf(angle) * ENEMY_BULLET_SPEED;
