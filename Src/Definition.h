@@ -3,6 +3,7 @@
 #include <DxLib.h>
 #include <string>
 
+// マクロ定義
 #define WINDOW_WIDTH_HD			(1280)
 #define WINDOW_HEIGHT_HD		(720)
 #define WINDOW_WIDTH_FHD		(1920)
@@ -21,7 +22,8 @@
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
 #define ENEMY_BULLET_SPEED		(2.0f)
 
-//	色
+// 定数定義
+// 色
 const unsigned int red = GetColor(255, 0, 0);
 const unsigned int green = GetColor(0, 255, 0);
 const unsigned int blue = GetColor(0, 0, 255);
@@ -42,8 +44,8 @@ extern int EnemyImage;
 extern int EnemyBulletImage;
 extern int EnemyBulletAnimations[];
 
+// プロトタイプ定義
 void Update();
-
 void Render();
 
 /// <summary>
