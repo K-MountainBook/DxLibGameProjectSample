@@ -20,7 +20,9 @@
 
 #define ENEMY_BULLET_MAX		(100)
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
-#define ENEMY_BULLET_SPEED		(2.0f)
+#define ENEMY_BULLET_SPEED		(5.0f)
+
+#define THREE_WAY_BULLETS		(3)
 
 // 定数定義
 // 色
@@ -58,6 +60,8 @@ enum MyInput {
 	D,
 
 	SPACE,
+
+	ESC,
 
 	InputMax,
 };
@@ -475,7 +479,7 @@ struct Enemy {
 
 	Bullet bullets[ENEMY_BULLET_MAX];
 	int shotInterval;
-	const int SHOT_INTEVAL = 10;
+	const int SHOT_INTEVAL = 50;
 
 	/// <summary>
 	/// 更新関数
@@ -507,7 +511,7 @@ struct Enemy {
 		}
 
 		Move();
-		Shoot(_targetX, _targetY);
+		Shoot(_targetX, _targetY, THREE_WAY_BULLETS);
 	}
 
 	/// <summary>
@@ -545,7 +549,10 @@ struct Enemy {
 	/// </summary>
 	/// <param name="targetX">目標のX座標</param>
 	/// <param name="targetY">目標のY座標</param>
-	void Shoot(float targetX, float targetY) {
+	void Shoot(float targetX, float targetY, int bulletCnt) {
+
+		int bulletsCnt = 0;
+
 		if (shotInterval < SHOT_INTEVAL) {
 			shotInterval++;
 		}
@@ -572,11 +579,15 @@ struct Enemy {
 				// targetX,targetYは目標の中央座標
 				float angle = atan2((targetY - bullets[i].gameObject.height) - gameObject.y, (targetX - bullets[i].gameObject.width) - gameObject.x);
 
+				angle += (DX_PI * 20 / 180) * (bulletsCnt - bulletCnt / 2);
+
 				bullets[i].moveX = cosf(angle) * ENEMY_BULLET_SPEED;
 				bullets[i].moveY = sinf(angle) * ENEMY_BULLET_SPEED;
 
-				break;
-
+				bulletsCnt++;
+				if (bulletsCnt >= bulletCnt) {
+					break;
+				}
 			}
 
 		}

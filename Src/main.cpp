@@ -8,12 +8,15 @@ const int InputAssign[InputMax] = {
 	KEY_INPUT_D,
 
 	KEY_INPUT_SPACE,
+
+	KEY_INPUT_ESCAPE,
 };
 
 int PlayerSpriteHandle[5];
 int PlayerBulletAnimation[PLAYER_BULLET_ANIMATION_MAX];
 
 int BackGroundImages[BACK_GROUND_IMAGE_MAX];
+
 BackGround BackGrounds[BACK_GROUND_IMAGE_MAX];
 
 Input input;
@@ -83,6 +86,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// 更新
 		Update();
 
+		if (input.IsDown(ESC)) {
+			break;
+		}
+
 		// 描画
 		Render();
 
@@ -96,12 +103,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			}
 		}
 
+
 		// 閉じるボタンが押されるなどのウィンドウメッセージを受信したらループを抜ける
 		if (ProcessMessage() == -1) {
 			break;
 		}
 
 	}
+
+	//	=================================================================
+	//		ゲームの解放処理
+	//	=================================================================
+
+	//	画像ハンドルの解放
+	// TODO: for文でやるしかないとDXLIBリファレンスには書いてあった
+	// delete[] PlayerSpriteHandle;
+	// delete[] EnemySpriteHandle;
+	//	画像ハンドルの解放
+	// delete[] PlayerBulletAnimation;
+	// delete[] EnemyBulletAnimations;
+
+	// delete[] BackGroundImages;
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 
