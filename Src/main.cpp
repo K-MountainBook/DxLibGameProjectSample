@@ -135,6 +135,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 /// </summary>
 void Update() {
 
+	// 背景スライド用のカウンタ
 	scr++;
 
 	// 入力を更新する（このフレームでどのキーが押されているか情報を更新する。）
