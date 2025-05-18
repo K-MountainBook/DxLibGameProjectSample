@@ -21,6 +21,7 @@
 #define ENEMY_BULLET_MAX		(100)
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
 #define ENEMY_BULLET_SPEED		(5.0f)
+#define ENEMY_MAX				(3)
 
 #define THREE_WAY_BULLETS		(3)
 
@@ -322,6 +323,7 @@ struct Bullet {
 			return;
 		}
 
+		// Update関数で指定したアニメーションを描画する
 		DrawGraph(gameObject.x, gameObject.y, animations[currentAnimation], true);
 	}
 };
@@ -387,7 +389,7 @@ struct Player {
 		if (!gameObject.isVisible) {
 			return;
 		}
-
+		// 自機の表示
 		DrawGraph(gameObject.x, gameObject.y, gameObject.image, TRUE);
 	}
 
@@ -476,6 +478,7 @@ struct Player {
 struct Enemy {
 	GameObject gameObject;
 	float moveX, moveY;
+	float playerX, playerY;
 
 	Bullet bullets[ENEMY_BULLET_MAX];
 	int shotInterval;
@@ -510,6 +513,8 @@ struct Enemy {
 			return;
 		}
 
+		playerX = _targetX;
+		playerY = _targetY;
 		Move();
 		Shoot(_targetX, _targetY, THREE_WAY_BULLETS);
 	}
@@ -525,8 +530,10 @@ struct Enemy {
 		if (!gameObject.isVisible) {
 			return;
 		}
+		float angle = atan2(playerY - gameObject.y, playerX - gameObject.x);
 
-		DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
+		// DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
+		DrawRotaGraph(gameObject.x, gameObject.y, 1, angle, gameObject.image, true);
 	}
 
 	/// <summary>

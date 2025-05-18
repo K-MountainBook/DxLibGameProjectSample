@@ -21,7 +21,7 @@ BackGround BackGrounds[BACK_GROUND_IMAGE_MAX];
 
 Input input;
 Player player;
-Enemy enemy;
+Enemy enemys[ENEMY_MAX];
 
 int EnemySpriteHandle[5];
 int EnemyBulletAnimations[ENEMY_BULLET_ANIMATION_MAX];
@@ -63,7 +63,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// プレイヤーの初期化
 	player.Init(PlayerSpriteHandle[2], true, 200, 200, 16.0f);
 	// エネミーの初期化
-	enemy.Init(EnemySpriteHandle[0], true, WINDOW_WIDTH_SVGA / 2 - 16, 30.0f, 16.0f);
+	for (int i = -1; i < ENEMY_MAX - 1; i++) {
+		enemys[i + 1].Init(EnemySpriteHandle[0], true, (WINDOW_WIDTH_SVGA / 2) + 200 * i - 16, 30.0f, 16.0f);
+	}
 	// 背景画像の初期化
 	BackGrounds[BACK_GROUND_1].Init(BackGroundImages[BACK_GROUND_1], -1.0f);
 	BackGrounds[BACK_GROUND_2].Init(BackGroundImages[BACK_GROUND_2], -5.0f);
@@ -73,8 +75,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		player.bullets[i].Init(PlayerBulletAnimation, false, 0, 0, 32.0f, PLAYER_BULLET_ANIMATION_MAX);
 	}
 
-	for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
-		enemy.bullets[i].Init(EnemyBulletAnimations, false, 0, 0, 16.0f, ENEMY_BULLET_ANIMATION_MAX);
+	for (int j = 0; j < ENEMY_MAX; j++) {
+		for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
+			enemys[j].bullets[i].Init(EnemyBulletAnimations, false, 0, 0, 16.0f, ENEMY_BULLET_ANIMATION_MAX);
+		}
 	}
 
 	// メインループ
@@ -143,7 +147,9 @@ void Update() {
 	// プレイヤーの情報を更新する（上のキー情報を利用するなどしてこのフレームでプレイヤーをどこに描画するか確定する）
 	player.Update();
 	// エネミーの情報を更新する。
-	enemy.Update(player.gameObject.cx, player.gameObject.cy);
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		enemys[i].Update(player.gameObject.cx, player.gameObject.cy);
+	}
 	// 背景の描画位置を更新する（動いているように見せるため、背景画像の位置を動かす）
 	for (int i = 0; i < BACK_GROUND_IMAGE_MAX; i++) {
 		BackGrounds[i].Update(scr);
@@ -166,5 +172,7 @@ void Render() {
 	// プレイヤーの描画を行う
 	player.Render();
 	//エネミーの描画を行う
-	enemy.Render();
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		enemys[i].Render();
+	}
 }
