@@ -20,10 +20,12 @@
 
 #define ENEMY_BULLET_MAX		(100)
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
-#define ENEMY_BULLET_SPEED		(5.0f)
+#define ENEMY_BULLET_SPEED		(2.0f)
 #define ENEMY_MAX				(3)
 
+#define ONE_WAY_BULLETS			(1)
 #define THREE_WAY_BULLETS		(3)
+#define FOUR_WAY_BULLETS		(4)
 
 // 定数定義
 // 色
@@ -48,6 +50,7 @@ extern int EnemyBulletImage;
 extern int EnemyBulletAnimations[];
 
 // プロトタイプ定義
+void Init();
 void Update();
 void Render();
 
@@ -481,8 +484,8 @@ struct Enemy {
 	float playerX, playerY;
 
 	Bullet bullets[ENEMY_BULLET_MAX];
-	int shotInterval;
-	const int SHOT_INTEVAL = 50;
+	float IntervalCnt;
+	const float SHOT_INTEVAL = 50.0f;
 
 	/// <summary>
 	/// 更新関数
@@ -496,7 +499,7 @@ struct Enemy {
 		gameObject.Init(_image, _visible, _x, _y, _radius);
 		moveX = moveY = 0.0f;
 
-		shotInterval = SHOT_INTEVAL;
+		IntervalCnt = SHOT_INTEVAL;
 	}
 
 	/// <summary>
@@ -515,8 +518,11 @@ struct Enemy {
 
 		playerX = _targetX;
 		playerY = _targetY;
+
+		// 移動関数
 		Move();
-		Shoot(_targetX, _targetY, THREE_WAY_BULLETS);
+		// 弾発射
+		Shoot(_targetX, _targetY, ONE_WAY_BULLETS, 5);
 	}
 
 	/// <summary>
@@ -530,16 +536,21 @@ struct Enemy {
 		if (!gameObject.isVisible) {
 			return;
 		}
-		float angle = atan2(playerY - gameObject.y, playerX - gameObject.x);
+		float angle = atan2(playerY - gameObject.y, playerX - gameObject.x) - DX_PI / 2;
 
 		// DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
-		DrawRotaGraph(gameObject.x, gameObject.y, 1, angle, gameObject.image, true);
+		DrawRotaGraph(gameObject.x, gameObject.y, 1, 0, gameObject.image, true);
 	}
 
 	/// <summary>
 	/// 移動関数
 	/// </summary>
 	void Move() {
+
+		// TODO:InitしたらSinカーブの位置を中心に戻せるようにする
+		moveX = sinf(DX_PI * 2 * (GetNowCount() / 1000.0f)) * 10;
+		moveY = 5;
+
 		gameObject.x += moveX;
 		gameObject.y += moveY;
 
@@ -548,6 +559,13 @@ struct Enemy {
 
 		// 非表示にする処理が必要
 		// 通常画面の端からエネミーの画像の幅/高さ分超えると非表示にするのが一般的
+		if (//(gameObject.x + gameObject.width < 0) ||				//	左端
+			//(WINDOW_WIDTH_SVGA < gameObject.x) ||			//	右端
+			(gameObject.y + gameObject.height < 0) ||				//	上端
+			(WINDOW_HEIGHT_SVGA < gameObject.y)) {			//	下端
+			gameObject.isVisible = false;
+			gameObject.y = 0;
+		}
 
 	}
 
@@ -556,18 +574,18 @@ struct Enemy {
 	/// </summary>
 	/// <param name="targetX">目標のX座標</param>
 	/// <param name="targetY">目標のY座標</param>
-	void Shoot(float targetX, float targetY, int bulletCnt) {
+	void Shoot(float targetX, float targetY, int bulletCnt, float shot_interval) {
 
 		int bulletsCnt = 0;
 
-		if (shotInterval < SHOT_INTEVAL) {
-			shotInterval++;
+		if (IntervalCnt < shot_interval) {
+			IntervalCnt++;
 		}
 
 		// 敵なのでインターバルが終わったら無条件で弾を吐き出す。
-		if (shotInterval >= SHOT_INTEVAL) {
+		if (IntervalCnt >= shot_interval) {
 
-			shotInterval = 0;
+			IntervalCnt = 0;
 
 			for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
 				// 既に表示されている（つまりは発射されている
@@ -577,14 +595,16 @@ struct Enemy {
 				}
 				// TODO:敵の中心（あるいは先端）から弾が出るようにしたい
 				// bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
-				bullets[i].gameObject.x = gameObject.cx - bullets[i].gameObject.width / 2;
-				bullets[i].gameObject.y = gameObject.cy - bullets[i].gameObject.height / 2;
+				bullets[i].gameObject.x = gameObject.x - bullets[i].gameObject.width / 2;
+				bullets[i].gameObject.y = gameObject.y - bullets[i].gameObject.height / 2;
+				bullets[i].gameObject.cx = bullets[i].gameObject.x - bullets[i].gameObject.width / 2;
+				bullets[i].gameObject.cy = bullets[i].gameObject.y - bullets[i].gameObject.height / 2;
 				bullets[i].gameObject.isVisible = true;
 
 
 				// ATANを用いて敵の角度（ラジアン）を計算
 				// targetX,targetYは目標の中央座標
-				float angle = atan2((targetY - bullets[i].gameObject.height) - gameObject.y, (targetX - bullets[i].gameObject.width) - gameObject.x);
+				float angle = atan2(targetY - gameObject.y, targetX - gameObject.x);
 
 				angle += (DX_PI * 20 / 180) * (bulletsCnt - bulletCnt / 2);
 

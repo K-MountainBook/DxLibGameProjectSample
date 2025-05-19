@@ -63,9 +63,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// プレイヤーの初期化
 	player.Init(PlayerSpriteHandle[2], true, 200, 200, 16.0f);
 	// エネミーの初期化
-	for (int i = -1; i < ENEMY_MAX - 1; i++) {
-		enemys[i + 1].Init(EnemySpriteHandle[0], true, (WINDOW_WIDTH_SVGA / 2) + 200 * i - 16, 30.0f, 16.0f);
-	}
+	//for (int i = -1; i < ENEMY_MAX - 1; i++) {
+	//	enemys[i + 1].Init(EnemySpriteHandle[0], true, (WINDOW_WIDTH_SVGA / 2) + 200 * i - 16, 30.0f, 16.0f);
+	//}
 	// 背景画像の初期化
 	BackGrounds[BACK_GROUND_1].Init(BackGroundImages[BACK_GROUND_1], -1.0f);
 	BackGrounds[BACK_GROUND_2].Init(BackGroundImages[BACK_GROUND_2], -5.0f);
@@ -74,7 +74,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	for (int i = 0; i < PLAYER_BULLET_MAX; i++) {
 		player.bullets[i].Init(PlayerBulletAnimation, false, 0, 0, 32.0f, PLAYER_BULLET_ANIMATION_MAX);
 	}
-
+	// エネミー弾の初期化
 	for (int j = 0; j < ENEMY_MAX; j++) {
 		for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
 			enemys[j].bullets[i].Init(EnemyBulletAnimations, false, 0, 0, 16.0f, ENEMY_BULLET_ANIMATION_MAX);
@@ -86,6 +86,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		// ミリ秒単位の現在時刻を得る
 		time = GetNowCount();
+
+		Init();
 
 		// 更新
 		Update();
@@ -132,6 +134,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 
 	return 0;				// ソフトの終了 
+}
+
+// ゲーム初期化部
+void Init() {
+	// 画面上の敵の表現数をとりあえず3にする
+	for (int i = -1; i < ENEMY_MAX - 1; i++) {
+		if (!enemys[i + 1].gameObject.isVisible) {
+			enemys[i + 1].Init(EnemySpriteHandle[0], true, (WINDOW_WIDTH_SVGA / 2) + 200 * i - 16, 30.0f, 16.0f);
+		}
+	}
 }
 
 /// <summary>
