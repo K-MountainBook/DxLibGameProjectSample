@@ -483,6 +483,8 @@ struct Enemy {
 	float moveX, moveY;
 	float playerX, playerY;
 
+	int sinMoveDefault;
+
 	Bullet bullets[ENEMY_BULLET_MAX];
 	float IntervalCnt;
 	const float SHOT_INTEVAL = 50.0f;
@@ -499,6 +501,7 @@ struct Enemy {
 		gameObject.Init(_image, _visible, _x, _y, _radius);
 		moveX = moveY = 0.0f;
 
+		sinMoveDefault = 0;
 		IntervalCnt = SHOT_INTEVAL;
 	}
 
@@ -522,7 +525,7 @@ struct Enemy {
 		// 移動関数
 		Move();
 		// 弾発射
-		Shoot(_targetX, _targetY, ONE_WAY_BULLETS, 5);
+		Shoot(_targetX, _targetY, ONE_WAY_BULLETS, 60);
 	}
 
 	/// <summary>
@@ -538,8 +541,9 @@ struct Enemy {
 		}
 		float angle = atan2(playerY - gameObject.y, playerX - gameObject.x) - DX_PI / 2;
 
+		// 描画座標は中心座標です
 		// DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
-		DrawRotaGraph(gameObject.x, gameObject.y, 1, 0, gameObject.image, true);
+		DrawRotaGraph(gameObject.cx, gameObject.cy, 1, 0, gameObject.image, true);
 	}
 
 	/// <summary>
@@ -548,8 +552,14 @@ struct Enemy {
 	void Move() {
 
 		// TODO:InitしたらSinカーブの位置を中心に戻せるようにする
-		moveX = sinf(DX_PI * 2 * (GetNowCount() / 1000.0f)) * 10;
-		moveY = 5;
+		// sin,cosに渡す引数の値が小さくなればなるほど波の間隔が広くなる
+		// 引いたらマイナス側、足したらプラス側に寄る
+		// 切り返しの時点で三角関数はマイナス値になる
+		// マイナスに転換するのがsinだと半周期かかる、cosだと1/4周期になる
+		// 値の変異が0スタートならsin、1スタートならcosを使う
+		moveX = cosf(sinMoveDefault * 0.1) * 10;
+
+		moveY = 1;
 
 		gameObject.x += moveX;
 		gameObject.y += moveY;
@@ -566,7 +576,12 @@ struct Enemy {
 			gameObject.isVisible = false;
 			gameObject.y = 0;
 		}
-
+		//if (sinMoveDefault < 120) {
+		sinMoveDefault++;
+		//}
+		//else {
+		//	sinMoveDefault = 0;
+		//}
 	}
 
 	/// <summary>
@@ -574,6 +589,8 @@ struct Enemy {
 	/// </summary>
 	/// <param name="targetX">目標のX座標</param>
 	/// <param name="targetY">目標のY座標</param>
+	/// <param name="bulletCnt">射撃する弾の数</param>
+	/// <param name="sshot_interval">射撃のインターバル</param>
 	void Shoot(float targetX, float targetY, int bulletCnt, float shot_interval) {
 
 		int bulletsCnt = 0;

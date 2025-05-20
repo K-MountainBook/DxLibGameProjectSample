@@ -141,7 +141,7 @@ void Init() {
 	// ‰æ–Êã‚Ì“G‚Ì•\Œ»”‚ð‚Æ‚è‚ ‚¦‚¸3‚É‚·‚é
 	for (int i = -1; i < ENEMY_MAX - 1; i++) {
 		if (!enemys[i + 1].gameObject.isVisible) {
-			enemys[i + 1].Init(EnemySpriteHandle[0], true, (WINDOW_WIDTH_SVGA / 2) + 200 * i - 16, 30.0f, 16.0f);
+			enemys[i + 1].Init(EnemySpriteHandle[0], true, (WINDOW_WIDTH_SVGA / 2) + 200 * i, 0, 16.0f);
 		}
 	}
 }
@@ -187,4 +187,8 @@ void Render() {
 	for (int i = 0; i < ENEMY_MAX; i++) {
 		enemys[i].Render();
 	}
+
+
+	DrawFormatString(0, 0, red, "%f", enemys[0].moveX);
+	DrawFormatString(0, 20, red, "%f", enemys[0].gameObject.x);
 }
