@@ -679,7 +679,7 @@ struct EnemyWave {
 
 	void Init() {
 		for (int i = 0; i < ENEMY_MAX; i++) {
-			enemies[i].Init(EnemySpriteHandle[0], false, 0, 0, 16.0f);
+			enemies[i].Init(enemies[i].gameObject.image, false, 0, 0, 16.0f);
 			for (int j = 0; j < ENEMY_BULLET_MAX; j++) {
 				enemies[i].bullets[j].Init(EnemyBulletAnimations, false, 0.0, 0.0, 4);
 			}
@@ -690,7 +690,7 @@ struct EnemyWave {
 	/// WaveÇÃèoåÇ
 	/// </summary>
 	/// <param name="_type">Waveî‘çÜ</param>
-	void Spawn(int _type) {
+	void Spawn(int _type = 0) {
 		int num = 0;
 		switch (_type) {
 		case 0:
@@ -711,9 +711,44 @@ struct EnemyWave {
 				continue;
 			}
 
-			enemies[i].Init(EnemySpriteHandle[0], true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius);
+			enemies[i].Init(enemies[i].gameObject.image, true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius);
 			enemies[i].moveX = info[_type][index].moveX;
 			enemies[i].moveY = info[_type][index].moveY;
+
+			for (int j = 0; j < ENEMY_BULLET_MAX; j++) {
+				enemies[i].bullets[i].Init(EnemyBulletAnimations, false, 0, 0, 4);
+			}
+
+			index++;
+
+			if (index >= num) {
+				break;
+			}
 		}
 	}
+
+	void Update(float _targetX, float _targetY) {
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			enemies[i].Update(_targetX, _targetY);
+		}
+
+		bool visible = false;
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			if (enemies[i].gameObject.isVisible) {
+				visible = true;
+				break;
+			}
+		}
+		if (!visible) {
+			Spawn(GetRand(2));
+		}
+
+	}
+
+	void Render() {
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			enemies[i].Render();
+		}
+	}
+
 };
