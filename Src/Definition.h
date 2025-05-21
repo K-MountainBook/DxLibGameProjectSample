@@ -22,6 +22,7 @@
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
 #define ENEMY_BULLET_SPEED		(2.0f)
 #define ENEMY_MAX				(3)
+#define ENEMY_SPEED				(3)
 
 #define ONE_WAY_BULLETS			(1)
 #define THREE_WAY_BULLETS		(3)
@@ -637,4 +638,82 @@ struct Enemy {
 		}
 	}
 
+};
+
+/// <summary>
+/// 敵Wave用
+/// </summary>
+struct EnemyWave {
+	struct SpawnInfo {
+		float x, y;		// 出現位置
+		float moveX, moveY;		// 移動方向
+	};
+
+	// 敵配列
+	Enemy enemies[ENEMY_MAX];
+
+	// 敵出現パターン
+	SpawnInfo info[3][10] = {
+		// wave1
+		{
+			{100.0f,-32.0f,0,ENEMY_SPEED},
+			{400.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED},
+			{700.0f,-32.0f,0,ENEMY_SPEED}
+		},
+		// wave2
+		{
+			{100,-32,0,ENEMY_SPEED},
+			{250,-32,0,ENEMY_SPEED},
+			{400,-32,0,ENEMY_SPEED},
+			{550,-32,0,ENEMY_SPEED},
+			{700,-32,0,ENEMY_SPEED},
+		},
+		// wave3
+		{
+			{100.0f,-32.0f,0,ENEMY_SPEED},
+			{400.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED},
+			{700.0f,-32.0f,0,ENEMY_SPEED}
+
+		}
+	};
+
+	void Init() {
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			enemies[i].Init(EnemySpriteHandle[0], false, 0, 0, 16.0f);
+			for (int j = 0; j < ENEMY_BULLET_MAX; j++) {
+				enemies[i].bullets[j].Init(EnemyBulletAnimations, false, 0.0, 0.0, 4);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Waveの出撃
+	/// </summary>
+	/// <param name="_type">Wave番号</param>
+	void Spawn(int _type) {
+		int num = 0;
+		switch (_type) {
+		case 0:
+			num = 3;
+			break;
+		case 1:
+			num = 5;
+			break;
+		case 2:
+			num = 3;
+			break;
+		}
+
+		int index = 0;
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			// 画面内に表示されている敵は新しくスポーンさせる必要がないので処理しない
+			if (enemies[i].gameObject.isVisible) {
+				continue;
+			}
+
+			enemies[i].Init(EnemySpriteHandle[0], true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius);
+			enemies[i].moveX = info[_type][index].moveX;
+			enemies[i].moveY = info[_type][index].moveY;
+		}
+	}
 };
