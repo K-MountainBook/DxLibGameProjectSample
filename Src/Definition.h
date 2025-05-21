@@ -482,7 +482,6 @@ struct Player {
 struct Enemy {
 	GameObject gameObject;
 	float moveX, moveY;
-	float playerX, playerY;
 
 	int sinMoveDefault;
 
@@ -520,9 +519,6 @@ struct Enemy {
 			return;
 		}
 
-		playerX = _targetX;
-		playerY = _targetY;
-
 		// 移動関数
 		Move();
 		// 弾発射
@@ -540,11 +536,11 @@ struct Enemy {
 		if (!gameObject.isVisible) {
 			return;
 		}
-		float angle = atan2(playerY - gameObject.y, playerX - gameObject.x) - DX_PI / 2;
+		// float angle = atan2(playerY - gameObject.y, playerX - gameObject.x) - DX_PI / 2;
 
-		// 描画座標は中心座標です
-		// DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
-		DrawRotaGraph(gameObject.cx, gameObject.cy, 1, 0, gameObject.image, true);
+		DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
+		// RotaGraphの描画座標は中心座標です
+		//DrawRotaGraph(gameObject.cx, gameObject.cy, 1, 0, gameObject.image, true);
 	}
 
 	/// <summary>
@@ -558,9 +554,9 @@ struct Enemy {
 		// 切り返しの時点で三角関数はマイナス値になる
 		// マイナスに転換するのがsinだと半周期かかる、cosだと1/4周期になる
 		// 値の変異が0スタートならsin、1スタートならcosを使う
-		moveX = cosf(sinMoveDefault * 0.1) * 10;
+		// moveX = cosf(sinMoveDefault * 0.1) * 10;
 
-		moveY = 1;
+		// moveY = 1;
 
 		gameObject.x += moveX;
 		gameObject.y += moveY;
@@ -705,11 +701,13 @@ struct EnemyWave {
 		}
 
 		int index = 0;
+
+
 		for (int i = 0; i < ENEMY_MAX; i++) {
 			// 画面内に表示されている敵は新しくスポーンさせる必要がないので処理しない
-			if (enemies[i].gameObject.isVisible) {
-				continue;
-			}
+			//if (enemies[i].gameObject.isVisible) {
+			//	continue;
+			//}
 
 			enemies[i].Init(enemies[i].gameObject.image, true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius);
 			enemies[i].moveX = info[_type][index].moveX;

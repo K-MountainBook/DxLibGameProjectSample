@@ -190,10 +190,10 @@ void Render() {
 	// プレイヤーの描画を行う
 	player.Render();
 	//エネミーの描画を行う
-	for (int i = 0; i < ENEMY_MAX; i++) {
-		enemys[i].Render();
-	}
-
+	//for (int i = 0; i < ENEMY_MAX; i++) {
+	//	enemys[i].Render();
+	//}
+	enemyWaves.Render();
 
 	DrawFormatString(0, 0, red, "%f", enemys[0].moveX);
 	DrawFormatString(0, 20, red, "%f", enemys[0].gameObject.x);
