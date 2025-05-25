@@ -21,7 +21,7 @@
 #define ENEMY_BULLET_MAX		(100)
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
 #define ENEMY_BULLET_SPEED		(2.0f)
-#define ENEMY_MAX				(3)
+#define ENEMY_MAX				(10)	// ‰æ–Êã‚Éo‚Ä‚­‚é“G‚ÌÅ‘å”
 #define ENEMY_SPEED				(3)
 
 #define ONE_WAY_BULLETS			(1)
@@ -719,6 +719,7 @@ struct EnemyWave {
 
 			index++;
 
+			// 
 			if (index >= num) {
 				break;
 			}
