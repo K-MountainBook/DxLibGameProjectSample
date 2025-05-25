@@ -700,8 +700,8 @@ struct EnemyWave {
 			break;
 		}
 
+		// waveに出てくる敵の数
 		int index = 0;
-
 
 		for (int i = 0; i < ENEMY_MAX; i++) {
 			// 画面内に表示されている敵は新しくスポーンさせる必要がないので処理しない
