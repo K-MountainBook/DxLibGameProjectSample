@@ -47,6 +47,7 @@ extern int PlayerBulletImage;
 extern int PlayerBulletAnimation[];
 
 extern int EnemyImage;
+extern int EnemySpriteHandle[];
 extern int EnemyBulletImage;
 extern int EnemyBulletAnimations[];
 
@@ -522,7 +523,7 @@ struct Enemy {
 		// à⁄ìÆä÷êî
 		Move();
 		// íeî≠éÀ
-		Shoot(_targetX, _targetY, ONE_WAY_BULLETS, 60);
+		Shoot(_targetX, _targetY, THREE_WAY_BULLETS, 60);
 	}
 
 	/// <summary>
@@ -675,7 +676,7 @@ struct EnemyWave {
 
 	void Init() {
 		for (int i = 0; i < ENEMY_MAX; i++) {
-			enemies[i].Init(enemies[i].gameObject.image, false, 0, 0, 16.0f);
+			enemies[i].Init(EnemySpriteHandle[0], false, 0, 0, 16.0f);
 			for (int j = 0; j < ENEMY_BULLET_MAX; j++) {
 				enemies[i].bullets[j].Init(EnemyBulletAnimations, false, 0.0, 0.0, 4);
 			}
@@ -714,7 +715,7 @@ struct EnemyWave {
 			enemies[i].moveY = info[_type][index].moveY;
 
 			for (int j = 0; j < ENEMY_BULLET_MAX; j++) {
-				enemies[i].bullets[i].Init(EnemyBulletAnimations, false, 0, 0, 4);
+				enemies[i].bullets[j].Init(EnemyBulletAnimations, false, 0, 0, 4, ENEMY_BULLET_ANIMATION_MAX);
 			}
 
 			index++;

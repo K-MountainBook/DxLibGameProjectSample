@@ -195,6 +195,6 @@ void Render() {
 	//}
 	enemyWaves.Render();
 
-	DrawFormatString(0, 0, red, "%f", enemys[0].moveX);
-	DrawFormatString(0, 20, red, "%f", enemys[0].gameObject.x);
+	DrawFormatString(0, 0, red, "%f", enemyWaves.enemies[0].gameObject.y);
+	DrawFormatString(0, 20, red, "%f", enemyWaves.enemies[0].gameObject.x);
 }
