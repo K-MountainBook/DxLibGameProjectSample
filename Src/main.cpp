@@ -192,7 +192,7 @@ void Update() {
 	//	BackGrounds[i].Update(scr);
 	//}
 
-	enemyWaves.Update(player.gameObject.cx, player.gameObject.cy);
+	enemyWaves.Update(player.gameObject.x, player.gameObject.y);
 }
 
 /// <summary>
