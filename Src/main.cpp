@@ -85,32 +85,53 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	enemyWaves.Init();
 	enemyWaves.Spawn();
 
+	GameSceneType currentScene = InGame;
+	GameSceneType nextScene = InGame;
+
+
 	// メインループ
 	while (1) {
 
 		// ミリ秒単位の現在時刻を得る
 		time = GetNowCount();
 
-		Init();
-
-		// 更新
-		Update();
-
+		// ESCキーが押されたら画面を閉じる（メインループを抜ける
 		if (input.IsDown(ESC)) {
 			break;
 		}
 
-		// 描画
-		Render();
+		switch (currentScene)
+		{
+		case Title:
+			currentScene = Title;
+			break;
+		case InGame:
 
-		// バックバッファの書き込みが終わったらフロントバッファへデータを転送する。
-		ScreenFlip();
+			currentScene = InGame;
 
-		// このループの処理が指定秒間フレームの処理時間より早く終わった場合は処理を待つ
-		while (1) {
-			if (GetNowCount() - time >= 1000 / FPS_60) {
-				break;
+			Init();
+
+			// 更新
+			Update();
+
+			// 描画
+			Render();
+
+			// バックバッファの書き込みが終わったらフロントバッファへデータを転送する。
+			ScreenFlip();
+
+			// このループの処理が指定秒間フレームの処理時間より早く終わった場合は処理を待つ
+			while (1) {
+				if (GetNowCount() - time >= 1000 / FPS_60) {
+					break;
+				}
 			}
+			break;
+		case Result:
+			currentScene = Result;
+			break;
+		default:
+			break;
 		}
 
 

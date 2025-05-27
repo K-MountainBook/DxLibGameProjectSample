@@ -89,6 +89,15 @@ enum BackGroundLayer {
 };
 
 
+enum GameSceneType {
+	Title,
+	InGame,
+	Result,
+
+	SceneMax
+};
+
+
 /*
 * C言語なので構造体の順番を守ること（コードの後に付け足した構造体は前の構造体から参照できないため）
 */
@@ -542,6 +551,8 @@ struct Enemy {
 	/// 描画関数
 	/// </summary>
 	void Render() {
+		// 自身に関連するオブジェクトすべてが非表示の場合は
+		// レンダリング処理を行わない
 		if (IsAllOut()) {
 			return;
 		}
@@ -737,7 +748,9 @@ struct EnemyWave {
 		int index = 0;
 
 		for (int i = 0; i < ENEMY_MAX; i++) {
-			//	敵自身、敵自身が撃った弾が全て画面外かどうか
+			//	敵自身が撃った弾が全て非表示かどうか
+			// 非表示でない場合はその敵の初期化処理は行わない
+			// →つまり関連するオブジェクトすべてが非表示にならないと初期化してはいけない
 			if (!enemies[i].IsAllOut()) {
 				continue;
 			}
