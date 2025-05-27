@@ -182,14 +182,15 @@ struct GameObject {
 		isVisible = _visible;
 		// 画像ハンドルの初期化
 		image = _image;
-		// 画像サイズの初期化
-		GetGraphSize(image, &width, &height);
 		// 座標の初期化
 		x = _x;
 		y = _y;
+
+		// 画像サイズの初期化
+		GetGraphSize(image, &width, &height);
 		// 中央座標の初期化（指定された座標＋イメージのサイズの半分（中央）
 		cx = _x + width * 0.5f;
-		cx = _y + height * 0.5f;
+		cy = _y + height * 0.5f;
 		// 半径の初期化
 		radius = _radius;
 	}
@@ -218,7 +219,7 @@ struct BackGround {
 	/// 更新関数
 	/// </summary>
 	/// <param name="_scroll">スクロール量</param>
-	void Update(float _scroll) {
+	void Update(int _scroll) {
 		if (!gameObject.isVisible) {
 			return;
 		}
@@ -249,8 +250,8 @@ struct BackGround {
 		);
 		// 上のDrawGraphでずれて背景がなくなった部分に画像の上部分を描画する
 		DrawRectGraph(
-			0, 0,									// 描画する「画面」の座標
-			0, gameObject.height + currentScroll,	// 描画する「画像」の左上の座標
+			0, 0,	// 描画する「画面」の座標
+			0, WINDOW_HEIGHT_SVGA + currentScroll,									// 描画する「画像」の左上の座標
 			gameObject.width, gameObject.height,
 			gameObject.image,
 			true

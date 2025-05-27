@@ -27,7 +27,7 @@ Enemy enemys[ENEMY_MAX];
 int EnemySpriteHandle[5];
 int EnemyBulletAnimations[ENEMY_BULLET_ANIMATION_MAX];
 
-int scr = 0;
+int scr;
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -88,6 +88,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	GameSceneType currentScene = InGame;
 	GameSceneType nextScene = InGame;
 
+	scr = 0;
 
 	// メインループ
 	while (1) {
@@ -179,6 +180,11 @@ void Update() {
 	// 背景スライド用のカウンタ
 	scr++;
 
+	//// 背景の描画位置を更新する（動いているように見せるため、背景画像の位置を動かす）
+	for (int i = 0; i < BACK_GROUND_IMAGE_MAX; i++) {
+		BackGrounds[i].Update(scr);
+	}
+
 	// 入力を更新する（このフレームでどのキーが押されているか情報を更新する。）
 	input.Update();
 	// プレイヤーの情報を更新する（上のキー情報を利用するなどしてこのフレームでプレイヤーをどこに描画するか確定する）
@@ -187,10 +193,6 @@ void Update() {
 	//for (int i = 0; i < ENEMY_MAX; i++) {
 	//	enemys[i].Update(player.gameObject.cx, player.gameObject.cy);
 	//}
-	//// 背景の描画位置を更新する（動いているように見せるため、背景画像の位置を動かす）
-	for (int i = 0; i < BACK_GROUND_IMAGE_MAX; i++) {
-		BackGrounds[i].Update(scr);
-	}
 
 	enemyWaves.Update(player.gameObject.x, player.gameObject.y);
 }
