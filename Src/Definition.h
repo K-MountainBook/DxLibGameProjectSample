@@ -21,12 +21,17 @@
 #define ENEMY_BULLET_MAX		(100)
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
 #define ENEMY_BULLET_SPEED		(2.0f)
-#define ENEMY_MAX				(10)	// 画面上に出てくる敵の最大数
+#define ENEMY_MAX				(256)	// 画面上に出てくる敵の最大数
 #define ENEMY_SPEED				(3)
 
 #define ONE_WAY_BULLETS			(1)
 #define THREE_WAY_BULLETS		(3)
 #define FOUR_WAY_BULLETS		(4)
+
+//	引数付きマクロ定義
+#define Deg2Rad(x) ( x / 180.0f * DX_PI_F )
+#define Rad2Deg(x) ( x / DX_PI_F * 180.0f )
+
 
 // 定数定義
 // 色
@@ -290,6 +295,23 @@ struct Bullet {
 			return;
 		}
 
+
+		// 移動させる
+		gameObject.x += moveX;
+		gameObject.y += moveY;
+
+		// 移動とともに中心座標も更新する。
+		gameObject.cx = gameObject.x + gameObject.width * 0.5f;
+		gameObject.cy = gameObject.y + gameObject.height * 0.5f;
+
+		// 画面外へ出た場合、非表示にする。
+		if ((gameObject.x + gameObject.width < -32) ||
+			(WINDOW_WIDTH_SVGA + 32 < gameObject.x) ||
+			(gameObject.y + gameObject.height < -32) ||
+			(WINDOW_HEIGHT_SVGA + 32 < gameObject.y)) {
+			gameObject.isVisible = false;
+		}
+
 		animationCounter++;
 
 		// アニメーションカウンタが一定量を超えた場合に次のアニメーションに遷移するようにする
@@ -301,22 +323,6 @@ struct Bullet {
 			if (currentAnimation >= animationCount) {
 				currentAnimation = 0;
 			}
-		}
-
-		// 移動させる
-		gameObject.x += moveX;
-		gameObject.y += moveY;
-
-		// 移動とともに中心座標も更新する。
-		gameObject.cx = gameObject.x + gameObject.width * 0.5f;
-		gameObject.cy = gameObject.y + gameObject.height * 0.5f;
-
-		// 画面外へ出た場合、非表示にする。
-		if ((gameObject.x + gameObject.width < 0) ||
-			(WINDOW_WIDTH_SVGA < gameObject.x) ||
-			(gameObject.y + gameObject.height < 0) ||
-			(WINDOW_HEIGHT_SVGA < gameObject.y)) {
-			gameObject.isVisible = false;
 		}
 	}
 
@@ -512,10 +518,16 @@ struct Enemy {
 	/// <param name="_targetX">発射先のX座標</param>
 	/// <param name="_targetY">発射先のY座標</param>
 	void Update(float _targetX, float _targetY) {
+		if (IsAllOut()) {
+			return;
+		}
+
+		// 弾の更新
 		for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
 			bullets[i].Update();
 		}
 
+		// Enemyが非表示ならば更新しない
 		if (!gameObject.isVisible) {
 			return;
 		}
@@ -530,10 +542,16 @@ struct Enemy {
 	/// 描画関数
 	/// </summary>
 	void Render() {
+		if (IsAllOut()) {
+			return;
+		}
+
+		// 弾の更新
 		for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
 			bullets[i].Render();
 		}
 
+		// 非表示ならば更新しない（敵本体）
 		if (!gameObject.isVisible) {
 			return;
 		}
@@ -567,15 +585,14 @@ struct Enemy {
 
 		// 非表示にする処理が必要
 		// 通常画面の端からエネミーの画像の幅/高さ分超えると非表示にするのが一般的
-		if (//(gameObject.x + gameObject.width < 0) ||				//	左端
-			//(WINDOW_WIDTH_SVGA < gameObject.x) ||			//	右端
+		if ((gameObject.x + gameObject.width < 0) ||				//	左端
+			(WINDOW_WIDTH_SVGA < gameObject.x) ||			//	右端
 			(gameObject.y + gameObject.height < 0) ||				//	上端
 			(WINDOW_HEIGHT_SVGA < gameObject.y)) {			//	下端
 			gameObject.isVisible = false;
-			gameObject.y = 0;
 		}
 		//if (sinMoveDefault < 120) {
-		sinMoveDefault++;
+		// sinMoveDefault++;
 		//}
 		//else {
 		//	sinMoveDefault = 0;
@@ -591,6 +608,7 @@ struct Enemy {
 	/// <param name="sshot_interval">射撃のインターバル</param>
 	void Shoot(float targetX, float targetY, int bulletCnt, float shot_interval) {
 
+		// 発射する弾の数量
 		int bulletsCnt = 0;
 
 		if (IntervalCnt < shot_interval) {
@@ -600,6 +618,7 @@ struct Enemy {
 		// 敵なのでインターバルが終わったら無条件で弾を吐き出す。
 		if (IntervalCnt >= shot_interval) {
 
+			// インターバルのリセット
 			IntervalCnt = 0;
 
 			for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
@@ -609,12 +628,7 @@ struct Enemy {
 					continue;
 				}
 				// TODO:敵の中心（あるいは先端）から弾が出るようにしたい
-				// bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
-				bullets[i].gameObject.x = gameObject.x - bullets[i].gameObject.width / 2;
-				bullets[i].gameObject.y = gameObject.y - bullets[i].gameObject.height / 2;
-				bullets[i].gameObject.cx = bullets[i].gameObject.x - bullets[i].gameObject.width / 2;
-				bullets[i].gameObject.cy = bullets[i].gameObject.y - bullets[i].gameObject.height / 2;
-				bullets[i].gameObject.isVisible = true;
+				bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
 
 
 				// ATANを用いて敵の角度（ラジアン）を計算
@@ -633,6 +647,24 @@ struct Enemy {
 			}
 
 		}
+	}
+
+
+	/// <summary>
+	/// 自身と自身が撃った球が画面外かのチェック
+	/// </summary>
+	/// <returns>画面外の場合True</returns>
+	bool IsAllOut() {
+		if (gameObject.isVisible) {
+			return false;
+		}
+
+		for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
+			if (bullets[i].gameObject.isVisible) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 };
@@ -705,10 +737,10 @@ struct EnemyWave {
 		int index = 0;
 
 		for (int i = 0; i < ENEMY_MAX; i++) {
-			// 画面内に表示されている敵は新しくスポーンさせる必要がないので処理しない
-			//if (enemies[i].gameObject.isVisible) {
-			//	continue;
-			//}
+			//	敵自身、敵自身が撃った弾が全て画面外かどうか
+			if (!enemies[i].IsAllOut()) {
+				continue;
+			}
 
 			enemies[i].Init(enemies[i].gameObject.image, true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius);
 			enemies[i].moveX = info[_type][index].moveX;
@@ -732,6 +764,8 @@ struct EnemyWave {
 			enemies[i].Update(_targetX, _targetY);
 		}
 
+		// すべての軍勢が非表示になっているか確認し
+		// なっていなければSpawn処理は行わない。
 		bool visible = false;
 		for (int i = 0; i < ENEMY_MAX; i++) {
 			if (enemies[i].gameObject.isVisible) {
