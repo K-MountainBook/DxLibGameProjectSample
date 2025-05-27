@@ -343,6 +343,9 @@ struct Bullet {
 			return;
 		}
 
+#if _DEBUG
+		DrawCircle(gameObject.cx, gameObject.cy, gameObject.radius, white, 1);
+#endif
 		// Update関数で指定したアニメーションを描画する
 		DrawGraph(gameObject.x, gameObject.y, animations[currentAnimation], true);
 	}
@@ -639,7 +642,7 @@ struct Enemy {
 					continue;
 				}
 				// TODO:敵の中心（あるいは先端）から弾が出るようにしたい
-				bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
+				bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, bullets[i].gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
 
 
 				// ATANを用いて敵の角度（ラジアン）を計算
@@ -711,7 +714,7 @@ struct EnemyWave {
 		// wave3
 		{
 			{100.0f,-32.0f,0,ENEMY_SPEED},
-			{400.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED},
+			{400.0f,-32.0f,0,ENEMY_SPEED * 2},
 			{700.0f,-32.0f,0,ENEMY_SPEED}
 
 		}

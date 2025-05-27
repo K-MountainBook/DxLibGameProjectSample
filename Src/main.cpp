@@ -188,9 +188,9 @@ void Update() {
 	//	enemys[i].Update(player.gameObject.cx, player.gameObject.cy);
 	//}
 	//// 背景の描画位置を更新する（動いているように見せるため、背景画像の位置を動かす）
-	//for (int i = 0; i < BACK_GROUND_IMAGE_MAX; i++) {
-	//	BackGrounds[i].Update(scr);
-	//}
+	for (int i = 0; i < BACK_GROUND_IMAGE_MAX; i++) {
+		BackGrounds[i].Update(scr);
+	}
 
 	enemyWaves.Update(player.gameObject.x, player.gameObject.y);
 }
