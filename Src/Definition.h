@@ -21,7 +21,8 @@
 #define ENEMY_BULLET_MAX		(100)
 #define	ENEMY_BULLET_ANIMATION_MAX	(4)
 #define ENEMY_BULLET_SPEED		(2.0f)
-#define ENEMY_MAX				(3)
+#define ENEMY_MAX				(10)	// 画面上に出てくる敵の最大数
+#define ENEMY_SPEED				(3)
 
 #define ONE_WAY_BULLETS			(1)
 #define THREE_WAY_BULLETS		(3)
@@ -46,6 +47,7 @@ extern int PlayerBulletImage;
 extern int PlayerBulletAnimation[];
 
 extern int EnemyImage;
+extern int EnemySpriteHandle[];
 extern int EnemyBulletImage;
 extern int EnemyBulletAnimations[];
 
@@ -481,7 +483,8 @@ struct Player {
 struct Enemy {
 	GameObject gameObject;
 	float moveX, moveY;
-	float playerX, playerY;
+
+	int sinMoveDefault;
 
 	Bullet bullets[ENEMY_BULLET_MAX];
 	float IntervalCnt;
@@ -499,6 +502,7 @@ struct Enemy {
 		gameObject.Init(_image, _visible, _x, _y, _radius);
 		moveX = moveY = 0.0f;
 
+		sinMoveDefault = 0;
 		IntervalCnt = SHOT_INTEVAL;
 	}
 
@@ -516,13 +520,10 @@ struct Enemy {
 			return;
 		}
 
-		playerX = _targetX;
-		playerY = _targetY;
-
 		// 移動関数
 		Move();
 		// 弾発射
-		Shoot(_targetX, _targetY, ONE_WAY_BULLETS, 5);
+		Shoot(_targetX, _targetY, THREE_WAY_BULLETS, 60);
 	}
 
 	/// <summary>
@@ -536,10 +537,11 @@ struct Enemy {
 		if (!gameObject.isVisible) {
 			return;
 		}
-		float angle = atan2(playerY - gameObject.y, playerX - gameObject.x) - DX_PI / 2;
+		// float angle = atan2(playerY - gameObject.y, playerX - gameObject.x) - DX_PI / 2;
 
-		// DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
-		DrawRotaGraph(gameObject.x, gameObject.y, 1, 0, gameObject.image, true);
+		DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
+		// RotaGraphの描画座標は中心座標です
+		//DrawRotaGraph(gameObject.cx, gameObject.cy, 1, 0, gameObject.image, true);
 	}
 
 	/// <summary>
@@ -548,8 +550,14 @@ struct Enemy {
 	void Move() {
 
 		// TODO:InitしたらSinカーブの位置を中心に戻せるようにする
-		moveX = sinf(DX_PI * 2 * (GetNowCount() / 1000.0f)) * 10;
-		moveY = 5;
+		// sin,cosに渡す引数の値が小さくなればなるほど波の間隔が広くなる
+		// 引いたらマイナス側、足したらプラス側に寄る
+		// 切り返しの時点で三角関数はマイナス値になる
+		// マイナスに転換するのがsinだと半周期かかる、cosだと1/4周期になる
+		// 値の変異が0スタートならsin、1スタートならcosを使う
+		// moveX = cosf(sinMoveDefault * 0.1) * 10;
+
+		// moveY = 1;
 
 		gameObject.x += moveX;
 		gameObject.y += moveY;
@@ -566,7 +574,12 @@ struct Enemy {
 			gameObject.isVisible = false;
 			gameObject.y = 0;
 		}
-
+		//if (sinMoveDefault < 120) {
+		sinMoveDefault++;
+		//}
+		//else {
+		//	sinMoveDefault = 0;
+		//}
 	}
 
 	/// <summary>
@@ -574,6 +587,8 @@ struct Enemy {
 	/// </summary>
 	/// <param name="targetX">目標のX座標</param>
 	/// <param name="targetY">目標のY座標</param>
+	/// <param name="bulletCnt">射撃する弾の数</param>
+	/// <param name="sshot_interval">射撃のインターバル</param>
 	void Shoot(float targetX, float targetY, int bulletCnt, float shot_interval) {
 
 		int bulletsCnt = 0;
@@ -617,6 +632,122 @@ struct Enemy {
 				}
 			}
 
+		}
+	}
+
+};
+
+/// <summary>
+/// 敵Wave用
+/// </summary>
+struct EnemyWave {
+	struct SpawnInfo {
+		float x, y;		// 出現位置
+		float moveX, moveY;		// 移動方向
+	};
+
+	// 敵配列
+	Enemy enemies[ENEMY_MAX];
+
+	// 敵出現パターン
+	SpawnInfo info[3][10] = {
+		// wave1
+		{
+			{100.0f,-32.0f,0,ENEMY_SPEED},
+			{400.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED},
+			{700.0f,-32.0f,0,ENEMY_SPEED}
+		},
+		// wave2
+		{
+			{100,-32,0,ENEMY_SPEED},
+			{250,-32,0,ENEMY_SPEED},
+			{400,-32,0,ENEMY_SPEED},
+			{550,-32,0,ENEMY_SPEED},
+			{700,-32,0,ENEMY_SPEED},
+		},
+		// wave3
+		{
+			{100.0f,-32.0f,0,ENEMY_SPEED},
+			{400.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED},
+			{700.0f,-32.0f,0,ENEMY_SPEED}
+
+		}
+	};
+
+	void Init() {
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			enemies[i].Init(EnemySpriteHandle[0], false, 0, 0, 16.0f);
+			for (int j = 0; j < ENEMY_BULLET_MAX; j++) {
+				enemies[i].bullets[j].Init(EnemyBulletAnimations, false, 0.0, 0.0, 4);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Waveの出撃
+	/// </summary>
+	/// <param name="_type">Wave番号</param>
+	void Spawn(int _type = 0) {
+		int num = 0;
+		switch (_type) {
+		case 0:
+			num = 3;
+			break;
+		case 1:
+			num = 5;
+			break;
+		case 2:
+			num = 3;
+			break;
+		}
+
+		// waveに出てくる敵の数
+		int index = 0;
+
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			// 画面内に表示されている敵は新しくスポーンさせる必要がないので処理しない
+			//if (enemies[i].gameObject.isVisible) {
+			//	continue;
+			//}
+
+			enemies[i].Init(enemies[i].gameObject.image, true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius);
+			enemies[i].moveX = info[_type][index].moveX;
+			enemies[i].moveY = info[_type][index].moveY;
+
+			for (int j = 0; j < ENEMY_BULLET_MAX; j++) {
+				enemies[i].bullets[j].Init(EnemyBulletAnimations, false, 0, 0, 4, ENEMY_BULLET_ANIMATION_MAX);
+			}
+
+			index++;
+
+			// 
+			if (index >= num) {
+				break;
+			}
+		}
+	}
+
+	void Update(float _targetX, float _targetY) {
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			enemies[i].Update(_targetX, _targetY);
+		}
+
+		bool visible = false;
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			if (enemies[i].gameObject.isVisible) {
+				visible = true;
+				break;
+			}
+		}
+		if (!visible) {
+			Spawn(GetRand(2));
+		}
+
+	}
+
+	void Render() {
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			enemies[i].Render();
 		}
 	}
 

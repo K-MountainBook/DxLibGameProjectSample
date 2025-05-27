@@ -18,6 +18,7 @@ int PlayerBulletAnimation[PLAYER_BULLET_ANIMATION_MAX];
 int BackGroundImages[BACK_GROUND_IMAGE_MAX];
 
 BackGround BackGrounds[BACK_GROUND_IMAGE_MAX];
+EnemyWave enemyWaves;
 
 Input input;
 Player player;
@@ -45,6 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// フレーム数調整用
 	int time;
+
 
 	// プレイヤー画像の読み込み（一応分割）
 	LoadDivGraph("Res/Image/Player_1.png", 5, 5, 1, 32, 32, PlayerSpriteHandle);
@@ -75,11 +77,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		player.bullets[i].Init(PlayerBulletAnimation, false, 0, 0, 32.0f, PLAYER_BULLET_ANIMATION_MAX);
 	}
 	// エネミー弾の初期化
-	for (int j = 0; j < ENEMY_MAX; j++) {
-		for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
-			enemys[j].bullets[i].Init(EnemyBulletAnimations, false, 0, 0, 16.0f, ENEMY_BULLET_ANIMATION_MAX);
-		}
-	}
+	//for (int j = 0; j < ENEMY_MAX; j++) {
+	//	for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
+	//		enemys[j].bullets[i].Init(EnemyBulletAnimations, false, 0, 0, 16.0f, ENEMY_BULLET_ANIMATION_MAX);
+	//	}
+	//}
+	enemyWaves.Init();
+	enemyWaves.Spawn();
 
 	// メインループ
 	while (1) {
@@ -141,7 +145,7 @@ void Init() {
 	// 画面上の敵の表現数をとりあえず3にする
 	for (int i = -1; i < ENEMY_MAX - 1; i++) {
 		if (!enemys[i + 1].gameObject.isVisible) {
-			enemys[i + 1].Init(EnemySpriteHandle[0], true, (WINDOW_WIDTH_SVGA / 2) + 200 * i - 16, 30.0f, 16.0f);
+			enemys[i + 1].Init(EnemySpriteHandle[0], true, (WINDOW_WIDTH_SVGA / 2) + 200 * i, 0, 16.0f);
 		}
 	}
 }
@@ -159,13 +163,15 @@ void Update() {
 	// プレイヤーの情報を更新する（上のキー情報を利用するなどしてこのフレームでプレイヤーをどこに描画するか確定する）
 	player.Update();
 	// エネミーの情報を更新する。
-	for (int i = 0; i < ENEMY_MAX; i++) {
-		enemys[i].Update(player.gameObject.cx, player.gameObject.cy);
-	}
-	// 背景の描画位置を更新する（動いているように見せるため、背景画像の位置を動かす）
-	for (int i = 0; i < BACK_GROUND_IMAGE_MAX; i++) {
-		BackGrounds[i].Update(scr);
-	}
+	//for (int i = 0; i < ENEMY_MAX; i++) {
+	//	enemys[i].Update(player.gameObject.cx, player.gameObject.cy);
+	//}
+	//// 背景の描画位置を更新する（動いているように見せるため、背景画像の位置を動かす）
+	//for (int i = 0; i < BACK_GROUND_IMAGE_MAX; i++) {
+	//	BackGrounds[i].Update(scr);
+	//}
+
+	enemyWaves.Update(player.gameObject.cx, player.gameObject.cy);
 }
 
 /// <summary>
@@ -184,7 +190,11 @@ void Render() {
 	// プレイヤーの描画を行う
 	player.Render();
 	//エネミーの描画を行う
-	for (int i = 0; i < ENEMY_MAX; i++) {
-		enemys[i].Render();
-	}
+	//for (int i = 0; i < ENEMY_MAX; i++) {
+	//	enemys[i].Render();
+	//}
+	enemyWaves.Render();
+
+	DrawFormatString(0, 0, red, "%f", enemyWaves.enemies[0].gameObject.y);
+	DrawFormatString(0, 20, red, "%f", enemyWaves.enemies[0].gameObject.x);
 }
