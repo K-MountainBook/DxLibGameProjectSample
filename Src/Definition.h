@@ -29,6 +29,9 @@
 #define THREE_WAY_BULLETS		(3)
 #define FOUR_WAY_BULLETS		(4)
 
+#define DEGREE_CIRCLE			(360.0f)
+#define RADIAN_CIRCLE			(4*DX_PI_F)
+
 //	引数付きマクロ定義
 #define Deg2Rad(x) ( x / 180.0f * DX_PI_F )
 #define Rad2Deg(x) ( x / DX_PI_F * 180.0f )
@@ -522,6 +525,7 @@ struct Player {
 				bullets[i].Init(PlayerBulletAnimation, true, gameObject.x, gameObject.y, gameObject.radius, PLAYER_BULLET_ANIMATION_MAX);
 
 
+				// 角度か分割量をfloatにしないと整数でしか帰ってこないので注意すること
 				float angle = Deg2Rad(360.0f / 64) * i;
 
 				bullets[i].moveX = cosf(angle) * PLAYER_BULLET_MOVEMENT;
@@ -757,6 +761,9 @@ struct EnemyWave {
 		}
 	};
 
+	/// <summary>
+	/// waveの初期化処理
+	/// </summary>
 	void Init() {
 		for (int i = 0; i < ENEMY_MAX; i++) {
 			enemies[i].Init(EnemySpriteHandle[0], false, 0, 0, 16.0f);
@@ -795,6 +802,8 @@ struct EnemyWave {
 				continue;
 			}
 
+			// 敵の軍勢の初期化を行う
+			// 初期化の内容は上に定義した出現パターン配列に依存する
 			enemies[i].Init(enemies[i].gameObject.image, true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius);
 			enemies[i].moveX = info[_type][index].moveX;
 			enemies[i].moveY = info[_type][index].moveY;
@@ -840,6 +849,12 @@ struct EnemyWave {
 
 };
 
+/// <summary>
+/// ２つのゲームオブジェクトの半径を元に接触を判定する
+/// </summary>
+/// <param name="_pObj1"></param>
+/// <param name="_pObj2"></param>
+/// <returns></returns>
 bool CheckHitCircle(GameObject* _pObj1, GameObject* _pObj2) {
 	if (!_pObj1->isVisible || !_pObj2->isVisible) {
 		return false;
