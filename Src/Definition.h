@@ -15,6 +15,7 @@
 
 #define PLAYER_MOVEMENT			(5.0f)	//	プレイヤーの移動量
 #define PLAYER_BULLET_MAX		(10000)	// 弾の最大数
+#define PLAYER_BULLET_CIRCLE_SHOT (256)
 #define PLAYER_BULLET_ANIMATION_MAX	(4)	// 弾のアニメーション枚数
 #define PLAYER_BULLET_MOVEMENT	(10.0f)
 
@@ -59,6 +60,7 @@ extern int EnemyBulletAnimations[];
 // プロトタイプ定義
 void Init();
 void Update();
+void CollisionCheck();
 void Render();
 
 /// <summary>
@@ -71,6 +73,7 @@ enum MyInput {
 	D,
 
 	SPACE,
+	Z,
 
 	ESC,
 
@@ -397,6 +400,7 @@ struct Player {
 
 		// 弾の発射処理
 		Shoot();
+		CircleShoot();
 	}
 
 	/// <summary>
@@ -493,6 +497,38 @@ struct Player {
 			}
 		}
 
+	}
+
+	// 円形に球を発射する
+	void CircleShoot() {
+		if (shotInterval < SHOT_INTERVAL) {
+			shotInterval++;
+		}
+
+
+		if (input.IsOn(Z) && shotInterval >= SHOT_INTERVAL) {
+			for (int i = 0; i < PLAYER_BULLET_MAX; i++) {
+				if (bullets[i].gameObject.isVisible) {
+					continue;
+				}
+
+
+				if (i > 64) {
+					break;
+				}
+
+				shotInterval = 0;
+				
+				bullets[i].Init(PlayerBulletAnimation, true, gameObject.x, gameObject.y, gameObject.radius, PLAYER_BULLET_ANIMATION_MAX);
+
+
+				float angle = Deg2Rad(360.0f / 64) * i;
+
+				bullets[i].moveX = cosf(angle) * PLAYER_BULLET_MOVEMENT;
+				bullets[i].moveY = sinf(angle) * PLAYER_BULLET_MOVEMENT;
+
+			}
+		}
 	}
 };
 
@@ -803,3 +839,20 @@ struct EnemyWave {
 	}
 
 };
+
+bool CheckHitCircle(GameObject* _pObj1, GameObject* _pObj2) {
+	if (!_pObj1->isVisible || !_pObj2->isVisible) {
+		return false;
+	}
+
+	float dx = _pObj2->cx - _pObj1->cx;
+	float dy = _pObj2->cy - _pObj1->cy;
+
+	float l = sqrtf(dx * dx + dy * dy);
+
+	if (l < _pObj1->radius + _pObj2->radius) {
+		return true;
+	}
+
+	return false;
+}

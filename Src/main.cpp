@@ -8,6 +8,7 @@ const int InputAssign[InputMax] = {
 	KEY_INPUT_D,
 
 	KEY_INPUT_SPACE,
+	KEY_INPUT_Z,
 
 	KEY_INPUT_ESCAPE,
 };
@@ -88,6 +89,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	GameSceneType currentScene = InGame;
 	GameSceneType nextScene = InGame;
 
+
+	// メインの処理内で初期化しないとグローバル関数が初期化されてる保証がない
 	scr = 0;
 
 	// メインループ
@@ -114,6 +117,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			// 更新
 			Update();
+
+			CollisionCheck();
 
 			// 描画
 			Render();
@@ -195,6 +200,19 @@ void Update() {
 	//}
 
 	enemyWaves.Update(player.gameObject.x, player.gameObject.y);
+}
+
+
+void CollisionCheck() {
+	// プレイヤーの弾と敵の判定
+	for (int i = 0; i < PLAYER_BULLET_MAX; i++) {
+		for (int j = 0; j < ENEMY_MAX; j++) {
+			if(CheckHitCircle(&player.bullets[i].gameObject,&enemyWaves.enemies[j].gameObject)){
+				player.bullets[i].gameObject.isVisible = false;
+				enemyWaves.enemies[j].gameObject.isVisible = false;
+			}
+		}
+	}
 }
 
 /// <summary>
