@@ -4,18 +4,18 @@
 #include <string>
 
 // マクロ定義
-#define WINDOW_WIDTH_HD			(1280)
-#define WINDOW_HEIGHT_HD		(720)
-#define WINDOW_WIDTH_FHD		(1920)
-#define WINDOW_HEIGHT_FHD		(1080)
-#define WINDOW_WIDTH_SVGA		(800)
-#define WINDOW_HEIGHT_SVGA		(600)
+#define WINDOW_WIDTH_HD			(1280)		// HDサイズ幅
+#define WINDOW_HEIGHT_HD		(720)		// HDサイズ高さ
+#define WINDOW_WIDTH_FHD		(1920)		// FHDサイズ幅
+#define WINDOW_HEIGHT_FHD		(1080)		// FHDサイズ高さ
+#define WINDOW_WIDTH_SVGA		(800)		// SVGAサイズ幅
+#define WINDOW_HEIGHT_SVGA		(600)		// SVGAサイズ高さ
 
-#define FPS_60					(60)
+#define FPS_60					(60)		// FPS
 
 #define PLAYER_MOVEMENT			(5.0f)	//	プレイヤーの移動量
 #define PLAYER_BULLET_MAX		(10000)	// 弾の最大数
-#define PLAYER_BULLET_CIRCLE_SHOT (256)
+#define PLAYER_BULLET_CIRCLE_SHOT (64 - 1)	// 周回ショットの弾数
 #define PLAYER_BULLET_ANIMATION_MAX	(4)	// 弾のアニメーション枚数
 #define PLAYER_BULLET_MOVEMENT	(10.0f)
 
@@ -367,7 +367,7 @@ struct Player {
 
 	Bullet bullets[PLAYER_BULLET_MAX];	// 画面内に存在できる弾の構造体
 	int shotInterval;				// カウント用変数
-	const int SHOT_INTERVAL = 10;	// 発射間隔定数
+	const int SHOT_INTERVAL = 1;	// 発射間隔定数
 
 	/// <summary>
 	/// 初期化関数
@@ -420,6 +420,10 @@ struct Player {
 		if (!gameObject.isVisible) {
 			return;
 		}
+
+#if _DEBUG
+		DrawCircle(gameObject.cx, gameObject.cy, gameObject.radius, white, 1);
+#endif#endif
 		// 自機の表示
 		DrawGraph(gameObject.x, gameObject.y, gameObject.image, TRUE);
 	}
@@ -494,6 +498,7 @@ struct Player {
 				// 発射する弾の初期化を行う
 				bullets[i].Init(PlayerBulletAnimation, true, gameObject.x, gameObject.y, gameObject.radius, PLAYER_BULLET_ANIMATION_MAX);
 
+				// 上に向かう様移動量を設定する
 				bullets[i].moveX = 0;
 				bullets[i].moveY = -PLAYER_BULLET_MOVEMENT;
 				break;
@@ -508,26 +513,31 @@ struct Player {
 			shotInterval++;
 		}
 
-
+		// Zキーを押した場合に発射する
 		if (input.IsOn(Z) && shotInterval >= SHOT_INTERVAL) {
+			// バレットを全てチェックする
 			for (int i = 0; i < PLAYER_BULLET_MAX; i++) {
+				// すでに表示されている（発射済み）のバレットについては処理を行わない。
 				if (bullets[i].gameObject.isVisible) {
 					continue;
 				}
-
-
-				if (i > 64) {
+				// バレットの発射数が規定値を超過している場合ループを終了する
+				if (i > PLAYER_BULLET_CIRCLE_SHOT) {
 					break;
 				}
 
+				// 新たに表示するバレットがあったらインターバルをリセットする
 				shotInterval = 0;
-				
+
+				// バレットの初期化を行う
 				bullets[i].Init(PlayerBulletAnimation, true, gameObject.x, gameObject.y, gameObject.radius, PLAYER_BULLET_ANIMATION_MAX);
 
 
+				// 発射角をラジアンで求め、ループ毎に角度を変更する。
 				// 角度か分割量をfloatにしないと整数でしか帰ってこないので注意すること
 				float angle = Deg2Rad(360.0f / 64) * i;
 
+				// cosをX軸に、sinをY軸の移動に設定する
 				bullets[i].moveX = cosf(angle) * PLAYER_BULLET_MOVEMENT;
 				bullets[i].moveY = sinf(angle) * PLAYER_BULLET_MOVEMENT;
 
@@ -611,6 +621,10 @@ struct Enemy {
 			return;
 		}
 		// float angle = atan2(playerY - gameObject.y, playerX - gameObject.x) - DX_PI / 2;
+
+#if _DEBUG
+		DrawCircle(gameObject.cx, gameObject.cy, gameObject.radius, white, 1);
+#endif#endif
 
 		DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
 		// RotaGraphの描画座標は中心座標です
@@ -859,7 +873,7 @@ bool CheckHitCircle(GameObject* _pObj1, GameObject* _pObj2) {
 	if (!_pObj1->isVisible || !_pObj2->isVisible) {
 		return false;
 	}
-
+	// まあセンターじゃなくても距離と半径が合ってればいいんじゃないかな・・・・
 	float dx = _pObj2->cx - _pObj1->cx;
 	float dy = _pObj2->cy - _pObj1->cy;
 
