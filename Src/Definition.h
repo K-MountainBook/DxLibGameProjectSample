@@ -25,6 +25,9 @@
 #define ENEMY_MAX				(256)	// 画面上に出てくる敵の最大数
 #define ENEMY_SPEED				(3)
 
+#define RAPID_FIRE_COUNT		(3)
+#define RAPID_FIRE_COOLDOWN		(10)
+
 #define EXPLOSION_MAX			(255)
 #define EXPLOSION_ANIMATION_MAX	(4)
 
@@ -38,6 +41,7 @@
 //	引数付きマクロ定義
 #define Deg2Rad(x) ( x / 180.0f * DX_PI_F )
 #define Rad2Deg(x) ( x / DX_PI_F * 180.0f )
+#define WaveMoveX(x)  ( cosf(x * 0.1) * 10)
 
 
 // 定数定義
@@ -561,6 +565,14 @@ struct Player {
 /// 敵構造体
 /// </summary>
 struct Enemy {
+
+
+	enum moveType {
+		STRAIGHT,
+		WAVE,
+		STOPANDBACK,
+	};
+
 	GameObject gameObject;
 	float moveX, moveY;
 
@@ -569,6 +581,11 @@ struct Enemy {
 	Bullet bullets[ENEMY_BULLET_MAX];
 	float IntervalCnt;
 	const float SHOT_INTEVAL = 50.0f;
+
+	int rapidFireCnt = 0;
+	int rapidFireInterval = 5;
+
+
 
 	/// <summary>
 	/// 更新関数
@@ -607,9 +624,12 @@ struct Enemy {
 		}
 
 		// 移動関数
+
 		Move();
+		
 		// 弾発射
-		Shoot(_targetX, _targetY, THREE_WAY_BULLETS, 60);
+		//Shoot(_targetX, _targetY, THREE_WAY_BULLETS, 60);
+		 rapidFire(_targetX, _targetY, RAPID_FIRE_COUNT, 60);
 	}
 
 	/// <summary>
@@ -647,21 +667,12 @@ struct Enemy {
 	/// </summary>
 	void Move() {
 
-		// TODO:InitしたらSinカーブの位置を中心に戻せるようにする
-		// sin,cosに渡す引数の値が小さくなればなるほど波の間隔が広くなる
-		// 引いたらマイナス側、足したらプラス側に寄る
-		// 切り返しの時点で三角関数はマイナス値になる
-		// マイナスに転換するのがsinだと半周期かかる、cosだと1/4周期になる
-		// 値の変異が0スタートならsin、1スタートならcosを使う
-		// moveX = cosf(sinMoveDefault * 0.1) * 10;
-
-		// moveY = 1;
-
 		gameObject.x += moveX;
 		gameObject.y += moveY;
 
 		gameObject.cx = gameObject.x + gameObject.width * 0.5f;
 		gameObject.cy = gameObject.y + gameObject.height * 0.5f;
+
 
 		// 非表示にする処理が必要
 		// 通常画面の端からエネミーの画像の幅/高さ分超えると非表示にするのが一般的
@@ -671,12 +682,7 @@ struct Enemy {
 			(WINDOW_HEIGHT_SVGA < gameObject.y)) {			//	下端
 			gameObject.isVisible = false;
 		}
-		//if (sinMoveDefault < 120) {
-		// sinMoveDefault++;
-		//}
-		//else {
-		//	sinMoveDefault = 0;
-		//}
+
 	}
 
 	/// <summary>
@@ -729,6 +735,61 @@ struct Enemy {
 		}
 	}
 
+	/// <summary>
+	/// 一定数の弾を一度に連射する
+	/// </summary>
+	/// <param name="targetX"></param>
+	/// <param name="targetY"></param>
+	/// <param name="bulletCnt"></param>
+	/// <param name="shot_interval"></param>
+	void rapidFire(float targetX, float targetY, int bulletCnt, float shot_interval) {
+
+		if (IntervalCnt < shot_interval) {
+			IntervalCnt++;
+			rapidFireCnt = bulletCnt;
+		}
+
+		// 敵なのでインターバルが終わったら無条件で弾を吐き出す。
+		if (IntervalCnt >= shot_interval) {
+
+			if (rapidFireInterval > RAPID_FIRE_COOLDOWN) {
+
+				rapidFireInterval = 0;
+
+				for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
+					// 既に表示されている（つまりは発射されている
+					// 弾に関しては処理を行わない（この関数は発射用のため
+					if (bullets[i].gameObject.isVisible) {
+						continue;
+					}
+					// 敵の中心（あるいは先端）から弾が出るように
+					bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, bullets[i].gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
+
+					// ATANを用いて敵の角度（ラジアン）を計算
+					// targetX,targetYは目標の中央座標
+					float angle = atan2(targetY - gameObject.y, targetX - gameObject.x);
+
+					bullets[i].moveX = cosf(angle) * ENEMY_BULLET_SPEED;
+					bullets[i].moveY = sinf(angle) * ENEMY_BULLET_SPEED;
+
+					rapidFireCnt--;
+
+					break;
+
+				}
+			}
+			else {
+				rapidFireInterval++;
+			}
+
+			if (rapidFireCnt <= 0) {
+				IntervalCnt = 0;
+			}
+
+		}
+
+	}
+
 
 	/// <summary>
 	/// 自身と自身が撃った球が画面外かのチェック
@@ -762,7 +823,7 @@ struct EnemyWave {
 	Enemy enemies[ENEMY_MAX];
 
 	// 敵出現パターン
-	SpawnInfo info[3][10] = {
+	SpawnInfo info[4][10] = {
 		// wave1
 		{
 			{100.0f,-32.0f,0,ENEMY_SPEED},
@@ -783,7 +844,7 @@ struct EnemyWave {
 			{400.0f,-32.0f,0,ENEMY_SPEED * 2},
 			{700.0f,-32.0f,0,ENEMY_SPEED}
 
-		}
+		},
 	};
 
 	/// <summary>
