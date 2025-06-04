@@ -25,6 +25,9 @@
 #define ENEMY_MAX				(256)	// 画面上に出てくる敵の最大数
 #define ENEMY_SPEED				(3)
 
+#define EXPLOSION_MAX			(255)
+#define EXPLOSION_ANIMATION_MAX	(4)
+
 #define ONE_WAY_BULLETS			(1)
 #define THREE_WAY_BULLETS		(3)
 #define FOUR_WAY_BULLETS		(4)
@@ -59,6 +62,14 @@ extern int EnemyImage;
 extern int EnemySpriteHandle[];
 extern int EnemyBulletImage;
 extern int EnemyBulletAnimations[];
+
+//	エネミーの弾のアニメーション画像
+extern int EnemyBulletAnimations[];
+
+extern int bgm;
+
+extern int se1;
+extern int se2;
 
 // プロトタイプ定義
 void Init();
@@ -696,7 +707,7 @@ struct Enemy {
 				if (bullets[i].gameObject.isVisible) {
 					continue;
 				}
-				// TODO:敵の中心（あるいは先端）から弾が出るようにしたい
+				// 敵の中心（あるいは先端）から弾が出るように
 				bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, bullets[i].gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
 
 
@@ -859,6 +870,65 @@ struct EnemyWave {
 		for (int i = 0; i < ENEMY_MAX; i++) {
 			enemies[i].Render();
 		}
+	}
+
+};
+
+/// <summary>
+/// 爆発アニメーション構造体
+/// </summary>
+struct Explosion {
+	GameObject gameObject;
+
+	int animations[EXPLOSION_ANIMATION_MAX];	// アニメーション画像ハンドル
+	int animationCounter;						// 何番目のアニメーションを表示するかのカウント
+	int currentAnimation;						// 今表示されているアニメーション番号
+
+	void Init(int _images[EXPLOSION_ANIMATION_MAX], bool _visible = true, float _x = 0.0f, float _y = 0.0f, float _radius = 0.0f) {
+		gameObject.Init(_images[0], _visible, _x, _y, _radius);
+
+		// アニメーション画像の初期化
+		for (int i = 0; i < EXPLOSION_ANIMATION_MAX; i++) {
+			animations[i] = _images[i];
+		}
+
+		animationCounter = 0;
+
+		currentAnimation = 0;
+
+		if (_visible) {
+			// サウンドの再生
+		}
+	}
+
+	void Update() {
+		// 非表示なら実行しない
+		if (!gameObject.isVisible) {
+			return;
+		}
+
+		// フレーム毎にカウンタを足しこむ
+		animationCounter++;
+
+		// 一定時間ごとにアニメーションを進めるようにする
+		// このプログラムだとカウンタが10進むごとにアニメーションを進める（10フレームで1アニメーション進める）
+		if (animationCounter % 10 == 0) {
+			// アニメーションを更新したらカウンタを0に戻す
+			animationCounter = 0;
+			currentAnimation++;
+
+			if (currentAnimation > EXPLOSION_ANIMATION_MAX) {
+				gameObject.isVisible = false;
+				currentAnimation = 0;
+			}
+		}
+	}
+	void Render() {
+		if (!gameObject.isVisible) {
+			return;
+		}
+
+		DrawGraph(gameObject.x, gameObject.y, animations[currentAnimation], true);
 	}
 
 };
