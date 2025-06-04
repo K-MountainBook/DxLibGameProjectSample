@@ -41,6 +41,13 @@ int ExpAnimations[EXPLOSION_ANIMATION_MAX];
 // スクロールカウント用の整数変数
 int scr;
 
+// BGM用音ハンドラ
+int bgm;
+
+// SE用音ハンドラ
+int se1;
+int se2;
+
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -127,6 +134,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			currentScene = InGame;
 
+			// 初期化
 			Init();
 
 			// 更新

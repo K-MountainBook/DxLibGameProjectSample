@@ -66,6 +66,11 @@ extern int EnemyBulletAnimations[];
 //	エネミーの弾のアニメーション画像
 extern int EnemyBulletAnimations[];
 
+extern int bgm;
+
+extern int se1;
+extern int se2;
+
 // プロトタイプ定義
 void Init();
 void Update();
@@ -702,7 +707,7 @@ struct Enemy {
 				if (bullets[i].gameObject.isVisible) {
 					continue;
 				}
-				// TODO:敵の中心（あるいは先端）から弾が出るようにしたい
+				// 敵の中心（あるいは先端）から弾が出るように
 				bullets[i].Init(EnemyBulletAnimations, true, gameObject.cx - bullets[i].gameObject.width / 2, gameObject.cy - bullets[i].gameObject.height / 2, bullets[i].gameObject.radius, ENEMY_BULLET_ANIMATION_MAX);
 
 
