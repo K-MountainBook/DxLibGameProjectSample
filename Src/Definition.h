@@ -14,7 +14,7 @@
 #define FPS_60					(60)		// FPS
 
 #define PLAYER_MOVEMENT			(5.0f)	//	プレイヤーの移動量
-#define PLAYER_BULLET_MAX		(10000)	// 弾の最大数
+#define PLAYER_BULLET_MAX		(256)	// 弾の最大数
 #define PLAYER_BULLET_CIRCLE_SHOT (64 - 1)	// 周回ショットの弾数
 #define PLAYER_BULLET_ANIMATION_MAX	(4)	// 弾のアニメーション枚数
 #define PLAYER_BULLET_MOVEMENT	(10.0f)
@@ -367,7 +367,7 @@ struct Player {
 
 	Bullet bullets[PLAYER_BULLET_MAX];	// 画面内に存在できる弾の構造体
 	int shotInterval;				// カウント用変数
-	const int SHOT_INTERVAL = 1;	// 発射間隔定数
+	const int SHOT_INTERVAL = 10;	// 発射間隔定数
 
 	/// <summary>
 	/// 初期化関数
@@ -423,7 +423,7 @@ struct Player {
 
 #if _DEBUG
 		DrawCircle(gameObject.cx, gameObject.cy, gameObject.radius, white, 1);
-#endif#endif
+#endif
 		// 自機の表示
 		DrawGraph(gameObject.x, gameObject.y, gameObject.image, TRUE);
 	}
