@@ -21,18 +21,30 @@ int BackGroundImages[BACK_GROUND_IMAGE_MAX];
 BackGround BackGrounds[BACK_GROUND_IMAGE_MAX];
 EnemyWave enemyWaves;
 
+Explosion expAnim[EXPLOSION_MAX] = {};
+
+// 入力用構造体の変数作成
 Input input;
+// プレイヤーの変数を作成
 Player player;
+// エネミーの変数を作成
 Enemy enemys[ENEMY_MAX];
 
+// 敵のスプライト用の画像ハンドル
 int EnemySpriteHandle[5];
+// 敵の弾のスプライト用画像ハンドル
 int EnemyBulletAnimations[ENEMY_BULLET_ANIMATION_MAX];
 
+// 爆発アニメーション用の画像ハンドル
+int ExpAnimations[EXPLOSION_ANIMATION_MAX];
+
+// スクロールカウント用の整数変数
 int scr;
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+
 
 	SetGraphMode(WINDOW_WIDTH_SVGA, WINDOW_HEIGHT_SVGA, 32, FPS_60);
 	ChangeWindowMode(TRUE);
@@ -57,6 +69,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LoadDivGraph("Res/Image/Bullet_1.png", PLAYER_BULLET_ANIMATION_MAX, 4, 1, 32, 32, PlayerBulletAnimation);
 	// 敵弾の画像の読み込み（分割）
 	LoadDivGraph("Res/Image/Bullet_3.png", ENEMY_BULLET_ANIMATION_MAX, 4, 1, 16, 16, EnemyBulletAnimations);
+	// 爆発のアニメーションの分割読み込み
+	LoadDivGraph("Res/Image/Explosion.png", EXPLOSION_ANIMATION_MAX, 6, 1, 32, 32, ExpAnimations);
 
 	// 背景画像の読み込み（1枚絵なので枚数分読み込む）
 	BackGroundImages[BACK_GROUND_1] = LoadGraph("Res/Image/Background_back.png");
@@ -74,9 +88,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	BackGrounds[BACK_GROUND_2].Init(BackGroundImages[BACK_GROUND_2], -5.0f);
 	BackGrounds[BACK_GROUND_3].Init(BackGroundImages[BACK_GROUND_3], -20.0f);
 	// プレイヤー弾の初期化
-	for (int i = 0; i < PLAYER_BULLET_MAX; i++) {
-		player.bullets[i].Init(PlayerBulletAnimation, false, 0, 0, 32.0f, PLAYER_BULLET_ANIMATION_MAX);
-	}
+	//for (int i = 0; i < PLAYER_BULLET_MAX; i++) {
+	//	player.bullets[i].Init(PlayerBulletAnimation, false, 0, 0, 32.0f, PLAYER_BULLET_ANIMATION_MAX);
+	//}
 	// エネミー弾の初期化
 	//for (int j = 0; j < ENEMY_MAX; j++) {
 	//	for (int i = 0; i < ENEMY_BULLET_MAX; i++) {
@@ -198,8 +212,11 @@ void Update() {
 	//for (int i = 0; i < ENEMY_MAX; i++) {
 	//	enemys[i].Update(player.gameObject.cx, player.gameObject.cy);
 	//}
-
 	enemyWaves.Update(player.gameObject.x, player.gameObject.y);
+	// 爆発アニメーションの更新を行う
+	for (int i = 0; i < EXPLOSION_MAX; i++) {
+		expAnim[i].Update();
+	}
 }
 
 
@@ -210,9 +227,25 @@ void CollisionCheck() {
 			if(CheckHitCircle(&player.bullets[i].gameObject,&enemyWaves.enemies[j].gameObject)){
 				player.bullets[i].gameObject.isVisible = false;
 				enemyWaves.enemies[j].gameObject.isVisible = false;
+
+
+				for (int k = 0; k < EXPLOSION_MAX; k++) {
+					if (expAnim[k].gameObject.isVisible) {
+						continue;
+					}
+					expAnim[k].Init(ExpAnimations, true, enemyWaves.enemies[j].gameObject.x, enemyWaves.enemies[j].gameObject.y, 0.0f);
+					// 爆発のアニメーションを一個出したら抜ける
+					break;
+				}
+
 			}
 		}
 	}
+
+	// TODO:プレイヤーと敵
+
+	// TODO:プレイヤーと敵の弾
+
 }
 
 /// <summary>
@@ -235,6 +268,10 @@ void Render() {
 	//	enemys[i].Render();
 	//}
 	enemyWaves.Render();
+
+	for (int i = 0; i < EXPLOSION_MAX; i++) {
+		expAnim[i].Render();
+	}
 
 	DrawFormatString(0, 0, red, "%f", enemyWaves.enemies[0].gameObject.y);
 	DrawFormatString(0, 20, red, "%f", enemyWaves.enemies[0].gameObject.x);
