@@ -14,7 +14,7 @@
 #define FPS_60					(60)		// FPS
 
 #define PLAYER_MOVEMENT			(5.0f)	//	プレイヤーの移動量
-#define PLAYER_BULLET_MAX		(10000)	// 弾の最大数
+#define PLAYER_BULLET_MAX		(256)	// 弾の最大数
 #define PLAYER_BULLET_CIRCLE_SHOT (64 - 1)	// 周回ショットの弾数
 #define PLAYER_BULLET_ANIMATION_MAX	(4)	// 弾のアニメーション枚数
 #define PLAYER_BULLET_MOVEMENT	(10.0f)
@@ -438,7 +438,7 @@ struct Player {
 
 #if _DEBUG
 		DrawCircle(gameObject.cx, gameObject.cy, gameObject.radius, white, 1);
-#endif#endif
+#endif
 		// 自機の表示
 		DrawGraph(gameObject.x, gameObject.y, gameObject.image, TRUE);
 	}

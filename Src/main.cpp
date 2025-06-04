@@ -228,6 +228,9 @@ void Update() {
 }
 
 
+/// <summary>
+/// Õ“Ë”»’è‚ğ‚Ü‚Æ‚ß‚Äˆ—‚·‚é‚Æ‚±‚ë
+/// </summary>
 void CollisionCheck() {
 	// ƒvƒŒƒCƒ„[‚Ì’e‚Æ“G‚Ì”»’è
 	for (int i = 0; i < PLAYER_BULLET_MAX; i++) {
