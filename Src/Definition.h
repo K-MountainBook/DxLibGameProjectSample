@@ -271,9 +271,9 @@ struct BackGround {
 		);
 		// 上のDrawGraphでずれて背景がなくなった部分に画像の上部分を描画する
 		DrawRectGraph(
-			0, 0,	// 描画する「画面」の座標
-			0, WINDOW_HEIGHT_SVGA + currentScroll,									// 描画する「画像」の左上の座標
-			gameObject.width, gameObject.height,
+			0, 0,										// 描画する「画面」の座標
+			0, WINDOW_HEIGHT_SVGA + currentScroll,		// 描画する「画像」の左上の座標
+			gameObject.width, gameObject.height,		
 			gameObject.image,
 			true
 		);
@@ -336,8 +336,10 @@ struct Bullet {
 		gameObject.cy = gameObject.y + gameObject.height * 0.5f;
 
 		// 画面外へ出た場合、非表示にする。
+		// 横
 		if ((gameObject.x + gameObject.width < -32) ||
 			(WINDOW_WIDTH_SVGA + 32 < gameObject.x) ||
+		// 縦
 			(gameObject.y + gameObject.height < -32) ||
 			(WINDOW_HEIGHT_SVGA + 32 < gameObject.y)) {
 			gameObject.isVisible = false;
@@ -610,7 +612,7 @@ struct Enemy {
 	/// </summary>
 	/// <param name="_targetX">発射先のX座標</param>
 	/// <param name="_targetY">発射先のY座標</param>
-	void Update(float _targetX, float _targetY) {
+	void Update(float _targetX, float _targetY, moveType movetype = STRAIGHT) {
 		if (IsAllOut()) {
 			return;
 		}
@@ -626,8 +628,18 @@ struct Enemy {
 		}
 
 		// 移動関数
-
-		Move();
+		switch (movetype)
+		{
+		case Enemy::STRAIGHT:
+			MoveStraight();
+			break;
+		case Enemy::WAVE:
+			break;
+		case Enemy::STOPANDBACK:
+			break;
+		default:
+			break;
+		}
 		
 		// 弾発射
 		//Shoot(_targetX, _targetY, THREE_WAY_BULLETS, 60);
@@ -668,7 +680,7 @@ struct Enemy {
 	/// <summary>
 	/// 移動関数
 	/// </summary>
-	void Move() {
+	void MoveStraight() {
 
 		gameObject.x += moveX;
 		gameObject.y += moveY;
@@ -910,6 +922,11 @@ struct EnemyWave {
 		}
 	}
 
+	/// <summary>
+	/// Enemy波状の更新
+	/// </summary>
+	/// <param name="_targetX"></param>
+	/// <param name="_targetY"></param>
 	void Update(float _targetX, float _targetY) {
 		for (int i = 0; i < ENEMY_MAX; i++) {
 			enemies[i].Update(_targetX, _targetY);
@@ -930,6 +947,9 @@ struct EnemyWave {
 
 	}
 
+	/// <summary>
+	/// EnemyWaveの描画
+	/// </summary>
 	void Render() {
 		for (int i = 0; i < ENEMY_MAX; i++) {
 			enemies[i].Render();
@@ -948,6 +968,14 @@ struct Explosion {
 	int animationCounter;						// 何番目のアニメーションを表示するかのカウント
 	int currentAnimation;						// 今表示されているアニメーション番号
 
+	/// <summary>
+	/// 爆発アニメーションの初期化
+	/// </summary>
+	/// <param name="_images"></param>
+	/// <param name="_visible"></param>
+	/// <param name="_x"></param>
+	/// <param name="_y"></param>
+	/// <param name="_radius"></param>
 	void Init(int _images[EXPLOSION_ANIMATION_MAX], bool _visible = true, float _x = 0.0f, float _y = 0.0f, float _radius = 0.0f) {
 		gameObject.Init(_images[0], _visible, _x, _y, _radius);
 
@@ -965,6 +993,9 @@ struct Explosion {
 		}
 	}
 
+	/// <summary>
+	/// 爆発アニメーションの更新
+	/// </summary>
 	void Update() {
 		// 非表示なら実行しない
 		if (!gameObject.isVisible) {
@@ -987,6 +1018,10 @@ struct Explosion {
 			}
 		}
 	}
+	
+	/// <summary>
+	/// 爆発アニメーションの描画
+	/// </summary>
 	void Render() {
 		if (!gameObject.isVisible) {
 			return;
