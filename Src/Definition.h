@@ -409,6 +409,7 @@ struct Player {
 			bullets[i].Update();
 		}
 
+		// 表示されていないオブジェクトについては処理を行わない
 		if (!gameObject.isVisible) {
 			return;
 		}
@@ -418,6 +419,7 @@ struct Player {
 
 		// 弾の発射処理
 		Shoot();
+		// 円形発射の関数
 		CircleShoot();
 	}
 
@@ -629,6 +631,7 @@ struct Enemy {
 		
 		// 弾発射
 		//Shoot(_targetX, _targetY, THREE_WAY_BULLETS, 60);
+		// 一定数連射する関数
 		 rapidFire(_targetX, _targetY, RAPID_FIRE_COUNT, 60);
 	}
 
