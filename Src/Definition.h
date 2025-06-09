@@ -589,7 +589,9 @@ struct Enemy {
 	int rapidFireCnt = 0;
 	int rapidFireInterval = 5;
 
+	moveType mType;
 
+	int src = 0;		// 時刻経過用変数
 
 	/// <summary>
 	/// 更新関数
@@ -599,12 +601,14 @@ struct Enemy {
 	/// <param name="_x">X座標</param>
 	/// <param name="_y">Y座標</param>
 	/// <param name="_radius">半径</param>
-	void Init(int _image, bool _visible = true, float _x = 0.0f, float _y = 0.0f, float _radius = 0.0f) {
+	void Init(int _image, bool _visible = true, float _x = 0.0f, float _y = 0.0f, float _radius = 0.0f, moveType movetype = Enemy::moveType::STRAIGHT) {
 		gameObject.Init(_image, _visible, _x, _y, _radius);
 		moveX = moveY = 0.0f;
 
 		sinMoveDefault = 0;
 		IntervalCnt = SHOT_INTEVAL;
+		mType = movetype;
+		src = 0;
 	}
 
 	/// <summary>
@@ -612,7 +616,7 @@ struct Enemy {
 	/// </summary>
 	/// <param name="_targetX">発射先のX座標</param>
 	/// <param name="_targetY">発射先のY座標</param>
-	void Update(float _targetX, float _targetY, moveType movetype = STRAIGHT) {
+	void Update(float _targetX, float _targetY) {
 		if (IsAllOut()) {
 			return;
 		}
@@ -628,12 +632,13 @@ struct Enemy {
 		}
 
 		// 移動関数
-		switch (movetype)
+		switch (mType)
 		{
 		case Enemy::STRAIGHT:
 			MoveStraight();
 			break;
 		case Enemy::WAVE:
+			MoveWave();
 			break;
 		case Enemy::STOPANDBACK:
 			break;
@@ -645,6 +650,8 @@ struct Enemy {
 		//Shoot(_targetX, _targetY, THREE_WAY_BULLETS, 60);
 		// 一定数連射する関数
 		 rapidFire(_targetX, _targetY, RAPID_FIRE_COUNT, 60);
+
+		 src++;
 	}
 
 	/// <summary>
@@ -698,6 +705,27 @@ struct Enemy {
 			gameObject.isVisible = false;
 		}
 
+	}
+
+	// 移動関数（周期）
+	void MoveWave() {
+		
+		// cos、sinカーブは1～0～-1を取る
+		gameObject.x += sinf(src / 10.0f) * 10;
+		gameObject.y += ENEMY_SPEED;
+
+		gameObject.cx = gameObject.x + gameObject.width * 0.5f;
+		gameObject.cy = gameObject.y + gameObject.height * 0.5f;
+
+		
+		// 非表示にする処理が必要
+		// 通常画面の端からエネミーの画像の幅/高さ分超えると非表示にするのが一般的
+		if ((gameObject.x + gameObject.width + WINDOW_WIDTH_SVGA < 0) ||				//	左端
+			(WINDOW_WIDTH_SVGA * 2 < gameObject.x) ||			//	右端
+			(gameObject.y + gameObject.height < 0) ||				//	上端
+			(WINDOW_HEIGHT_SVGA < gameObject.y)) {			//	下端
+			gameObject.isVisible = false;
+		}
 	}
 
 	/// <summary>
@@ -832,6 +860,7 @@ struct EnemyWave {
 	struct SpawnInfo {
 		float x, y;		// 出現位置
 		float moveX, moveY;		// 移動方向
+		Enemy::moveType moveType;
 	};
 
 	// 敵配列
@@ -841,24 +870,30 @@ struct EnemyWave {
 	SpawnInfo info[4][10] = {
 		// wave1
 		{
-			{100.0f,-32.0f,0,ENEMY_SPEED},
-			{400.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED},
-			{700.0f,-32.0f,0,ENEMY_SPEED}
+			{100.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT },
+			{400.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{700.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT}
 		},
 		// wave2
 		{
-			{100,-32,0,ENEMY_SPEED},
-			{250,-32,0,ENEMY_SPEED},
-			{400,-32,0,ENEMY_SPEED},
-			{550,-32,0,ENEMY_SPEED},
-			{700,-32,0,ENEMY_SPEED},
+			{100,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{250,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{400,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{550,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{700,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
 		},
 		// wave3
 		{
-			{100.0f,-32.0f,0,ENEMY_SPEED},
-			{400.0f,-32.0f,0,ENEMY_SPEED * 2},
-			{700.0f,-32.0f,0,ENEMY_SPEED}
+			{100.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{400.0f,-32.0f,0,ENEMY_SPEED * 2,Enemy::moveType::STRAIGHT},
+			{700.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT}
 
+		},
+		// wave4
+		{
+			{100.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE},
+			{400.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE},
+			{700.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE}
 		},
 	};
 
@@ -878,8 +913,9 @@ struct EnemyWave {
 	/// Waveの出撃
 	/// </summary>
 	/// <param name="_type">Wave番号</param>
-	void Spawn(int _type = 0) {
+	void Spawn(Enemy::moveType _type = Enemy::STRAIGHT) {
 		int num = 0;
+
 		switch (_type) {
 		case 0:
 			num = 3;
@@ -888,6 +924,9 @@ struct EnemyWave {
 			num = 5;
 			break;
 		case 2:
+			num = 3;
+			break;
+		case 3:
 			num = 3;
 			break;
 		}
@@ -905,7 +944,7 @@ struct EnemyWave {
 
 			// 敵の軍勢の初期化を行う
 			// 初期化の内容は上に定義した出現パターン配列に依存する
-			enemies[i].Init(enemies[i].gameObject.image, true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius);
+			enemies[i].Init(enemies[i].gameObject.image, true, info[_type][index].x, info[_type][index].y, enemies[i].gameObject.radius, info[_type][index].moveType);
 			enemies[i].moveX = info[_type][index].moveX;
 			enemies[i].moveY = info[_type][index].moveY;
 
@@ -942,7 +981,7 @@ struct EnemyWave {
 			}
 		}
 		if (!visible) {
-			Spawn(GetRand(2));
+			Spawn((Enemy::moveType)GetRand(3));
 		}
 
 	}

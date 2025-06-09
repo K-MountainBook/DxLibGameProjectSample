@@ -20,6 +20,7 @@ int BackGroundImages[BACK_GROUND_IMAGE_MAX];
 
 BackGround BackGrounds[BACK_GROUND_IMAGE_MAX];
 EnemyWave enemyWaves;
+Enemy TestEnemy;
 
 Explosion expAnim[EXPLOSION_MAX] = {};
 
@@ -107,6 +108,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	enemyWaves.Init();
 	enemyWaves.Spawn();
 
+	TestEnemy.Init(EnemySpriteHandle[0], true, WINDOW_WIDTH_SVGA / 2, 10.0f, 16);
+
 	GameSceneType currentScene = InGame;
 	GameSceneType nextScene = InGame;
 
@@ -139,11 +142,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			// 更新
 			Update();
+			// TestEnemy.Update(player.gameObject.cx, player.gameObject.cy, Enemy::moveType::WAVE);
 
 			CollisionCheck();
 
 			// 描画
 			Render();
+			// TestEnemy.Render();
 
 			// バックバッファの書き込みが終わったらフロントバッファへデータを転送する。
 			ScreenFlip();
