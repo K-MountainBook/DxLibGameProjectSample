@@ -577,6 +577,12 @@ struct Enemy {
 		STOPANDBACK,
 	};
 
+	//enum STOPANDBACK_moveMode {
+	//	foward,
+	//	stop,
+	//	back
+	//};
+
 	GameObject gameObject;
 	float moveX, moveY;
 
@@ -641,6 +647,7 @@ struct Enemy {
 			MoveWave();
 			break;
 		case Enemy::STOPANDBACK:
+			MoveStopAndBack();
 			break;
 		default:
 			break;
@@ -657,7 +664,7 @@ struct Enemy {
 	/// <summary>
 	/// 描画関数
 	/// </summary>
-	void Render() {
+	void Render(float _targetX, float _targetY) {
 		// 自身に関連するオブジェクトすべてが非表示の場合は
 		// レンダリング処理を行わない
 		if (IsAllOut()) {
@@ -679,9 +686,15 @@ struct Enemy {
 		DrawCircle(gameObject.cx, gameObject.cy, gameObject.radius, white, 1);
 #endif#endif
 
-		DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
+		if (mType != Enemy::STOPANDBACK) {
+			DrawGraph(gameObject.x, gameObject.y, gameObject.image, true);
+		} else {
 		// RotaGraphの描画座標は中心座標です
-		//DrawRotaGraph(gameObject.cx, gameObject.cy, 1, 0, gameObject.image, true);
+			// ATANを用いて敵の角度（ラジアン）を計算
+			// targetX,targetYは目標の中央座標
+			float angle = atan2(_targetY - gameObject.cy, _targetX - gameObject.cx) - DX_PI / 2;
+			DrawRotaGraph(gameObject.cx, gameObject.cy, 1, angle, gameObject.image, true);
+		}
 	}
 
 	/// <summary>
@@ -711,13 +724,42 @@ struct Enemy {
 	void MoveWave() {
 		
 		// cos、sinカーブは1～0～-1を取る
-		gameObject.x += sinf(src / 10.0f) * 10;
+		gameObject.x += cosf(src / 10.0f) * 10;
 		gameObject.y += ENEMY_SPEED;
 
 		gameObject.cx = gameObject.x + gameObject.width * 0.5f;
 		gameObject.cy = gameObject.y + gameObject.height * 0.5f;
 
 		
+		// 非表示にする処理が必要
+		// 通常画面の端からエネミーの画像の幅/高さ分超えると非表示にするのが一般的
+		if ((gameObject.x + gameObject.width + WINDOW_WIDTH_SVGA < 0) ||				//	左端
+			(WINDOW_WIDTH_SVGA * 2 < gameObject.x) ||			//	右端
+			(gameObject.y + gameObject.height < 0) ||				//	上端
+			(WINDOW_HEIGHT_SVGA < gameObject.y)) {			//	下端
+			gameObject.isVisible = false;
+		}
+	}
+
+	// 移動後一定時間滞留したあとに引き返す
+	void MoveStopAndBack() {
+
+
+		if (src <= 100) {
+			rapidFireInterval = 0;
+			gameObject.x += moveX;
+			gameObject.y += moveY;
+		}
+		else if (src > 200) {
+
+			rapidFireInterval = 0;
+			gameObject.x -= moveX;
+			gameObject.y -= moveY;
+		}
+		gameObject.cx = gameObject.x + gameObject.width * 0.5f;
+		gameObject.cy = gameObject.y + gameObject.height * 0.5f;
+		src++;
+
 		// 非表示にする処理が必要
 		// 通常画面の端からエネミーの画像の幅/高さ分超えると非表示にするのが一般的
 		if ((gameObject.x + gameObject.width + WINDOW_WIDTH_SVGA < 0) ||				//	左端
@@ -866,34 +908,40 @@ struct EnemyWave {
 	// 敵配列
 	Enemy enemies[ENEMY_MAX];
 
-	// 敵出現パターン
-	SpawnInfo info[4][10] = {
+	// 敵出現テーブル
+	SpawnInfo info[5][5] = {
 		// wave1
 		{
-			{100.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT },
-			{400.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED,Enemy::moveType::STRAIGHT},
-			{700.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT}
+			{100.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT },
+			{400.0f - 16.0f,WINDOW_HEIGHT_SVGA,0,-ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{700.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT}
 		},
 		// wave2
 		{
-			{100,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
-			{250,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
-			{400,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
-			{550,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
-			{700,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{100 - 16.0f,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{250 - 16.0f,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{400 - 16.0f,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{550 - 16.0f,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{700 - 16.0f,-32,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
 		},
 		// wave3
 		{
-			{100.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
-			{400.0f,-32.0f,0,ENEMY_SPEED * 2,Enemy::moveType::STRAIGHT},
-			{700.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT}
+			{100.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT},
+			{400.0f - 16.0f,-32.0f,0,ENEMY_SPEED * 2,Enemy::moveType::STRAIGHT},
+			{700.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STRAIGHT}
 
 		},
 		// wave4
 		{
-			{100.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE},
-			{400.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE},
-			{700.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE}
+			{100.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE},
+			{400.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE},
+			{700.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::WAVE}
+		},
+		// wave5
+		{
+			{100.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STOPANDBACK},
+			{400.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STOPANDBACK},
+			{700.0f - 16.0f,-32.0f,0,ENEMY_SPEED,Enemy::moveType::STOPANDBACK}
 		},
 	};
 
@@ -913,7 +961,7 @@ struct EnemyWave {
 	/// Waveの出撃
 	/// </summary>
 	/// <param name="_type">Wave番号</param>
-	void Spawn(Enemy::moveType _type = Enemy::STRAIGHT) {
+	void Spawn(int _type = 0) {
 		int num = 0;
 
 		switch (_type) {
@@ -927,6 +975,9 @@ struct EnemyWave {
 			num = 3;
 			break;
 		case 3:
+			num = 3;
+			break;
+		case 4:
 			num = 3;
 			break;
 		}
@@ -981,17 +1032,20 @@ struct EnemyWave {
 			}
 		}
 		if (!visible) {
-			Spawn((Enemy::moveType)GetRand(3));
+			Spawn(GetRand(4));
+// 			Spawn((Enemy::moveType)4);
 		}
 
 	}
 
 	/// <summary>
-	/// EnemyWaveの描画
+	///  EnemyWaveの描画
 	/// </summary>
-	void Render() {
+	/// <param name="_targetX">プレイヤー位置X</param>
+	/// <param name="_targetY">プレイヤー位置Y</param>
+	void Render(float _targetX, float _targetY) {
 		for (int i = 0; i < ENEMY_MAX; i++) {
-			enemies[i].Render();
+			enemies[i].Render(_targetX, _targetY);
 		}
 	}
 

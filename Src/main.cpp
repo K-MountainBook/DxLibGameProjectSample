@@ -283,12 +283,17 @@ void Render() {
 	//for (int i = 0; i < ENEMY_MAX; i++) {
 	//	enemys[i].Render();
 	//}
-	enemyWaves.Render();
+	enemyWaves.Render(player.gameObject.cx, player.gameObject.cy);
 
 	for (int i = 0; i < EXPLOSION_MAX; i++) {
 		expAnim[i].Render();
 	}
 
-	DrawFormatString(0, 0, red, "%f", enemyWaves.enemies[0].gameObject.y);
-	DrawFormatString(0, 20, red, "%f", enemyWaves.enemies[0].gameObject.x);
+	//for(int i = 0;i < ENEMY_MAX;i++){
+	//	if(enemyWaves.enemies[0].gameObject.isVisible){
+	//		DrawFormatString(0, 0, red, "%f", enemyWaves.enemies[0].gameObject.y);
+	//		DrawFormatString(0, 20, red, "%f", enemyWaves.enemies[0].gameObject.x);
+	//		break;
+	//	}
+	//}
 }
